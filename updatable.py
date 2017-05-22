@@ -180,9 +180,7 @@ if __name__ == '__main__':
 
     # Get list of packages
     if args.file:
-        packages = parse_requirements_list(
-            args.file
-        )
+        packages = parse_requirements_list(args.file)
     else:
         packages = get_parsed_environment_package_list()
 
