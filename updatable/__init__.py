@@ -7,7 +7,7 @@ from datetime import datetime
 from pip.operations import freeze
 
 __author__ = "Harald Nezbeda (hn@nezhar.com)"
-__version__ = "0.1.0"
+__version__ = "0.1.2"
 
 
 def get_parsed_environment_package_list():
@@ -133,6 +133,7 @@ def get_package_update_list(package_name, version):
     newer_releases = len(major_updates + minor_updates + patch_updates)
 
     return {
+        'latest_release': data['info']['version'],
         'newer_releases': newer_releases,
         'major_updates': sorted(major_updates, key=lambda x: semantic_version.Version.coerce(x['version']), reverse=True),
         'minor_updates': sorted(minor_updates, key=lambda x: semantic_version.Version.coerce(x['version']), reverse=True),
