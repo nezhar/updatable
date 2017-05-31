@@ -1,4 +1,5 @@
 .idea
-venv
 *.pyc
-
+venv/**
+dist/**
+updatable.egg-info/**

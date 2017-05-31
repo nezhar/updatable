@@ -7,7 +7,7 @@ from datetime import datetime
 from pip.operations import freeze
 
 __author__ = "Harald Nezbeda (hn@nezhar.com)"
-__version__ = "0.1"
+__version__ = "0.1.0"
 
 
 def get_parsed_environment_package_list():
