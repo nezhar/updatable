@@ -7,7 +7,7 @@ from datetime import datetime
 from pip.operations import freeze
 
 __author__ = "Harald Nezbeda (hn@nezhar.com)"
-__version__ = "0.1.2"
+__version__ = "0.1.3"
 
 
 def get_parsed_environment_package_list():
@@ -86,7 +86,7 @@ def get_pypi_package_data(package_name):
 def get_package_update_list(package_name, version):
     """
     Return update information of a package from a given version
-    
+
     :param package_name: string
     :param version: string
     :return: dict
@@ -145,7 +145,7 @@ def get_package_update_list(package_name, version):
 def __list_package_updates(package_name, version):
     """
     Function used to list all package updates in console
-    
+
     :param package_name: string
     :param version: string
     """
@@ -174,7 +174,10 @@ def __list_updates(update_type, update_list):
             print("  -- %(version)s on %(upload_time)s" % update_item)
 
 
-if __name__ == '__main__':
+def __updatable():
+    """
+    Function used to output packages update information in the console
+    """
     # Add argument for console
     parser = argparse.ArgumentParser()
     parser.add_argument('file', nargs='?', type=argparse.FileType(), default=None, help='Requirements file')
@@ -189,3 +192,6 @@ if __name__ == '__main__':
     # Output updates
     for package in packages:
         __list_package_updates(package['package'], package['version'])
+
+if __name__ == '__main__':
+    __updatable()

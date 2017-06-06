@@ -10,7 +10,7 @@ os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
 
 setup(
     name='updatable',
-    version='0.1.2',
+    version='0.1.3',
     packages=find_packages(),
     include_package_data=True,
     license='MIT License',
@@ -20,10 +20,11 @@ setup(
     author='Harald Nezbeda',
     author_email='hn@nezhar.com',
     classifiers=[
-        'Environment :: Web Environment',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: MIT License',
         'Operating System :: OS Independent',
+        'Natural Language :: English',
+        'Topic :: Utilities',
         'Programming Language :: Python',
         'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 2.7',
@@ -35,4 +36,9 @@ setup(
         'semantic_version',
         'pyopenssl',
     ],
+    entry_points={
+        'console_scripts': [
+            'updatable = updatable:__updatable',
+        ]
+    },
 )
