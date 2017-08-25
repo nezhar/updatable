@@ -7,7 +7,7 @@ from datetime import datetime
 from pip.operations import freeze
 
 __author__ = "Harald Nezbeda (hn@nezhar.com)"
-__version__ = "0.1.4"
+__version__ = "0.1.5"
 
 
 def get_parsed_environment_package_list():
@@ -95,6 +95,7 @@ def get_package_update_list(package_name, version):
     data = get_pypi_package_data(package_name)
 
     latest_release = ''
+    latest_release_license = ''
     major_updates = []
     minor_updates = []
     patch_updates = []
@@ -102,6 +103,7 @@ def get_package_update_list(package_name, version):
 
     if data:
         latest_release = data['info']['version']
+        latest_release_license = data['info']['license'] if data['info']['license'] else ''
 
         for release, info in data['releases'].items():
             upload_time = None
@@ -137,6 +139,7 @@ def get_package_update_list(package_name, version):
 
     return {
         'latest_release': latest_release,
+        'latest_release_license': latest_release_license,
         'newer_releases': newer_releases,
         'major_updates': sorted(major_updates, key=lambda x: semantic_version.Version.coerce(x['version']), reverse=True),
         'minor_updates': sorted(minor_updates, key=lambda x: semantic_version.Version.coerce(x['version']), reverse=True),
@@ -198,4 +201,3 @@ def __updatable():
 
 if __name__ == '__main__':
     __updatable()
-
