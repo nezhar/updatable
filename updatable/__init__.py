@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import re
 import argparse
 import requests
@@ -5,9 +6,6 @@ import semantic_version
 
 from datetime import datetime
 from pip.operations import freeze
-
-__author__ = "Harald Nezbeda (hn@nezhar.com)"
-__version__ = "0.1.5"
 
 
 def get_parsed_environment_package_list():

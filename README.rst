@@ -1,4 +1,3 @@
-=========
 Updatable
 =========
 
@@ -15,7 +14,7 @@ The latest release of updatable can be installed via PyPI:
 
 
 Usage
-~~~~~~~~~~~
+~~~~~
 
 The package can be used as a command line tool, so you can get a list of all
 packages that require updates from your current environment. You may also use

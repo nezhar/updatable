@@ -1,5 +1,6 @@
 .idea
 *.pyc
+build/**
 venv/**
 dist/**
 updatable.egg-info/**
