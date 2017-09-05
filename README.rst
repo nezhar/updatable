@@ -1,6 +1,9 @@
 Updatable
 =========
 
+.. image:: https://travis-ci.org/nezhar/updatable.svg?branch=master
+    :target: https://travis-ci.org/nezhar/updatable
+
 Finds packages that require updates on a python environment
 
 Installation

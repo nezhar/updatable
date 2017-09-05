@@ -1,11 +1,15 @@
 #!/usr/bin/env python
 import unittest
+import os
 
 import updatable
 
 
+PATH = os.path.dirname(os.path.realpath(__file__))
+
+
 def get_environment_requirements_list_monkey(*args, **kwargs):
-    with open('fixtures/requirements-initial.txt') as f:
+    with open(os.path.join(PATH, 'fixtures/requirements-initial.txt')) as f:
         content = f.readlines()
 
     return content

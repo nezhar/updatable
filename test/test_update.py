@@ -6,10 +6,11 @@ import datetime
 
 import updatable
 
+
 PATH = os.path.dirname(os.path.realpath(__file__))
 
 
-def get_pypi_package_data_money(package_name):
+def get_pypi_package_data_monkey(package_name):
     with open(os.path.join(PATH, 'fixtures', 'pypi-%s.json' % package_name)) as data_file:
         return json.load(data_file)
 
@@ -21,7 +22,7 @@ class TestUpdate(unittest.TestCase):
 
     def setUp(self):
         self.get_pypi_package_data_orig = updatable.get_pypi_package_data
-        updatable.get_pypi_package_data = get_pypi_package_data_money
+        updatable.get_pypi_package_data = get_pypi_package_data_monkey
 
     def tearDown(self):
         updatable.get_pypi_package_data = self.get_pypi_package_data_orig
