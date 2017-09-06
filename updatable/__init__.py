@@ -60,17 +60,25 @@ def parse_requirements_list(requirements_list):
     return req_list
 
 
-def get_pypi_package_data(package_name):
+def get_pypi_package_data(package_name, version=None):
     """
     Get package data from pypi by the package name
 
     https://wiki.python.org/moin/PyPIJSON
 
     :param package_name: string
+    :param version: string
     :return: dict
     """
+    pypi_url = 'https://pypi.python.org/pypi'
+
+    if version:
+        package_url = '%s/%s/%s/json' % (pypi_url, package_name, version, )
+    else:
+        package_url = '%s/%s/json' % (pypi_url, package_name, )
+
     try:
-        response = requests.get('https://pypi.python.org/pypi/%s/json' % package_name)
+        response = requests.get(package_url)
     except requests.ConnectionError:
         raise RuntimeError('Connection error!')
 
@@ -90,20 +98,30 @@ def get_package_update_list(package_name, version):
     :return: dict
     """
     package_version = semantic_version.Version.coerce(version)
-    data = get_pypi_package_data(package_name)
 
+    # Get package and version data from pypi
+    package_data = get_pypi_package_data(package_name)
+    version_data = get_pypi_package_data(package_name, version)
+
+    # Current release specific information
+    current_release = ''
+    current_release_license = ''
+
+    # Latest release specific information
     latest_release = ''
     latest_release_license = ''
+
+    # Information about packages
     major_updates = []
     minor_updates = []
     patch_updates = []
     non_semantic_versions = []
 
-    if data:
-        latest_release = data['info']['version']
-        latest_release_license = data['info']['license'] if data['info']['license'] else ''
+    if package_data:
+        latest_release = package_data['info']['version']
+        latest_release_license = package_data['info']['license'] if package_data['info']['license'] else ''
 
-        for release, info in data['releases'].items():
+        for release, info in package_data['releases'].items():
             upload_time = None
             if info:
                 upload_time = datetime.strptime(info[0]['upload_time'], "%Y-%m-%dT%H:%M:%S")
@@ -132,10 +150,16 @@ def get_package_update_list(package_name, version):
                 # Keep track of versions that could not be recognized as semantic
                 non_semantic_versions.append({'version': release, 'upload_time': upload_time})
 
+    if version_data:
+        current_release = version_data['info']['version']
+        current_release_license = version_data['info']['license'] if version_data['info']['license'] else ''
+
     # Get number of newer releases available for the given package
     newer_releases = len(major_updates + minor_updates + patch_updates)
 
     return {
+        'current_release': current_release,
+        'current_release_license': current_release_license,
         'latest_release': latest_release,
         'latest_release_license': latest_release_license,
         'newer_releases': newer_releases,

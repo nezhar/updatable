@@ -10,8 +10,10 @@ import updatable
 PATH = os.path.dirname(os.path.realpath(__file__))
 
 
-def get_pypi_package_data_monkey(package_name):
-    with open(os.path.join(PATH, 'fixtures', 'pypi-%s.json' % package_name)) as data_file:
+def get_pypi_package_data_monkey(package_name, version=None):
+    json_file = 'pypi-%s.json' % package_name
+
+    with open(os.path.join(PATH, 'fixtures', json_file)) as data_file:
         return json.load(data_file)
 
 

@@ -1,0 +1,81 @@
+{
+  "info": {
+    "maintainer": "",
+    "docs_url": null,
+    "requires_python": "",
+    "maintainer_email": "",
+    "cheesecake_code_kwalitee_id": null,
+    "keywords": "",
+    "package_url": "http://pypi.python.org/pypi/package3",
+    "author": "Package 3 author",
+    "author_email": "package3@package.test",
+    "download_url": "",
+    "platform": "",
+    "version": "1.0.0",
+    "cheesecake_documentation_id": null,
+    "_pypi_hidden": false,
+    "description": "UNKNOWN\n\n\n",
+    "release_url": "http://pypi.python.org/pypi/package3/1.0.1",
+    "downloads": {
+      "last_month": 0,
+      "last_week": 0,
+      "last_day": 0
+    },
+    "_pypi_ordering": 141,
+    "requires_dist": [],
+    "classifiers": [],
+    "name": "Package3",
+    "bugtrack_url": "",
+    "license": "GPL-2.0",
+    "summary": "Python package",
+    "home_page": "https://www.url.tld/",
+    "cheesecake_installability_id": null
+  },
+  "releases": {
+    "1.0.0": [
+      {
+        "has_sig": false,
+        "upload_time": "2011-09-29T23:34:21",
+        "comment_text": "",
+        "python_version": "source",
+        "url": "",
+        "md5_digest": "",
+        "downloads": 0,
+        "filename": "package.tar.gz",
+        "packagetype": "sdist",
+        "path": "f0/package.tar.gz",
+        "size": 1234
+      }
+    ],
+    "2.0.0": [
+      {
+        "has_sig": false,
+        "upload_time": "2013-11-29T23:34:21",
+        "comment_text": "",
+        "python_version": "source",
+        "url": "",
+        "md5_digest": "",
+        "downloads": 0,
+        "filename": "package.tar.gz",
+        "packagetype": "sdist",
+        "path": "f0/package.tar.gz",
+        "size": 1234
+      }
+    ],
+    "3.0.0": [
+      {
+        "has_sig": false,
+        "upload_time": "2015-09-29T23:34:21",
+        "comment_text": "",
+        "python_version": "source",
+        "url": "",
+        "md5_digest": "",
+        "downloads": 0,
+        "filename": "package.tar.gz",
+        "packagetype": "sdist",
+        "path": "f0/package.tar.gz",
+        "size": 1234
+      }
+    ]
+  }
+}
