@@ -177,10 +177,11 @@ def get_package_update_list(package_name, version):
         'latest_release': latest_release,
         'latest_release_license': latest_release_license,
         'newer_releases': newer_releases,
+        'pre_releases': len(pre_releases),
         'major_updates': sorted(major_updates, key=lambda x: semantic_version.Version.coerce(x['version']), reverse=True),
         'minor_updates': sorted(minor_updates, key=lambda x: semantic_version.Version.coerce(x['version']), reverse=True),
         'patch_updates': sorted(patch_updates, key=lambda x: semantic_version.Version.coerce(x['version']), reverse=True),
-        'pre_releases': sorted(pre_releases, key=lambda x: semantic_version.Version.coerce(x['version']), reverse=True),
+        'pre_release_updates': sorted(pre_releases, key=lambda x: semantic_version.Version.coerce(x['version']), reverse=True),
         'non_semantic_versions': non_semantic_versions,
     }
 
@@ -195,12 +196,12 @@ def __list_package_updates(package_name, version):
 
     updates = get_package_update_list(package_name, version)
 
-    if updates['newer_releases']:
+    if updates['newer_releases'] or updates['pre_releases']:
         print('%s (%s)' % (package_name, version))
         __list_updates('Major releases', updates['major_updates'])
         __list_updates('Minor releases', updates['minor_updates'])
         __list_updates('Patch releases', updates['patch_updates'])
-        __list_updates('Pre releases', updates['pre_releases'])
+        __list_updates('Pre releases', updates['pre_release_updates'])
         __list_updates('Unknown releases', updates['non_semantic_versions'])
         print("___")
 
