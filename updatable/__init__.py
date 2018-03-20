@@ -1,16 +1,13 @@
 # -*- coding: utf-8 -*-
+import sys
 import re
 import argparse
 import requests
 import semantic_version
 
 from datetime import datetime
-from pip.operations import freeze
-
-try:
-    from packaging.version import parse
-except ImportError:
-    from pip._vendor.packaging.version import parse
+from subprocess import check_output
+from packaging.version import parse
 
 
 def get_parsed_environment_package_list():
@@ -31,10 +28,10 @@ def get_environment_requirements_list():
     :return: string
     """
     requirement_list = []
-    requirements = freeze.freeze()
+    requirements = check_output([sys.executable, '-m', 'pip', 'freeze'])
 
-    for requirement in requirements:
-        requirement_list.append(requirement)
+    for requirement in requirements.split():
+        requirement_list.append(requirement.decode("utf-8"))
 
     return requirement_list
 
