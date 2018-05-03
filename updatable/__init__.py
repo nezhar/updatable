@@ -72,7 +72,7 @@ def get_pypi_package_data(package_name, version=None):
     :param version: string
     :return: dict
     """
-    pypi_url = 'https://pypi.python.org/pypi'
+    pypi_url = 'https://pypi.org/pypi'
 
     if version:
         package_url = '%s/%s/%s/json' % (pypi_url, package_name, version, )
