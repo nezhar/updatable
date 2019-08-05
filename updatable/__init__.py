@@ -10,6 +10,115 @@ from subprocess import check_output
 from packaging.version import parse
 
 
+def is_major_update(release, package):
+    """
+    Checks if the release is a major update compared to the package
+
+    :param release: semantic_version.Version
+    :param package: semantic_version.Version
+    :return: bool
+    """
+    return release in semantic_version.Spec(">=%s" % package.next_major())
+
+
+def is_minor_update(release, package):
+    """
+    Checks if the release is a minor update compared to the package
+
+    :param release: semantic_version.Version
+    :param package: semantic_version.Version
+    :return: bool
+    """
+    return release in semantic_version.Spec(">=%s,<%s" % (package.next_minor(), package.next_major()))
+
+
+def is_patch_update(release, package):
+    """
+    Checks if the release is a patch update compared to the package
+
+    :param release: semantic_version.Version
+    :param package: semantic_version.Version
+    :return: bool
+    """
+    return release in semantic_version.Spec(">=%s,<%s" % (package.next_patch(), package.next_minor()))
+
+
+def sorted_versions(versions):
+    """
+    Returns the list of Versions in ascending order
+
+    :param versions: semantic_version.Version[]
+    :return: semantic_version.Version[]
+    """
+    return sorted(versions, key=lambda x: semantic_version.Version.coerce(x['version']), reverse=True)
+
+
+def get_categorized_package_data(package_data, package_version):
+    """
+    Returns all Versions grouped by type compared to the current package version
+
+    :param package_data: dict
+    :param package_version: semantic_version.Version
+    :return: {
+        major_updates: semantic_version.Version[]
+        minor_updates: semantic_version.Version[]
+        patch_updates: semantic_version.Version[]
+        pre_release_updates: semantic_version.Version[]
+        non_semantic_versions: semantic_version.Version[]
+    }
+    """
+    major_updates = []
+    minor_updates = []
+    patch_updates = []
+    pre_release_updates = []
+    non_semantic_versions = []
+
+    for release, info in package_data['releases'].items():
+        parsed_release = parse(release)
+
+        upload_time = None
+        if info:
+            upload_time = datetime.strptime(info[0]['upload_time'], "%Y-%m-%dT%H:%M:%S")
+
+        try:
+            # Get semantic version of package
+            release_version = semantic_version.Version.coerce(release)
+
+            if not parsed_release.is_prerelease:
+                # Place package in the appropriate semantic visioning list
+                if is_major_update(release_version, package_version):
+                    major_updates.append({
+                        'version': release,
+                        'upload_time': upload_time,
+                    })
+                elif is_minor_update(release_version, package_version):
+                    minor_updates.append({
+                        'version': release,
+                        'upload_time': upload_time,
+                    })
+                elif is_patch_update(release_version, package_version):
+                    patch_updates.append({
+                        'version': release,
+                        'upload_time': upload_time,
+                    })
+            else:
+                pre_release_updates.append({
+                    'version': release,
+                    'upload_time': upload_time
+                })
+        except ValueError:
+            # Keep track of versions that could not be recognized as semantic
+            non_semantic_versions.append({'version': release, 'upload_time': upload_time})
+
+    return {
+        'major_updates': sorted_versions(major_updates),
+        'minor_updates': sorted_versions(minor_updates),
+        'patch_updates': sorted_versions(patch_updates),
+        'pre_release_updates': sorted_versions(pre_release_updates),
+        'non_semantic_versions': non_semantic_versions,
+    }
+
+
 def get_parsed_environment_package_list():
     """
     Get a parsed list of packages in the current environment
@@ -114,59 +223,26 @@ def get_package_update_list(package_name, version):
     latest_release_license = ''
 
     # Information about packages
-    major_updates = []
-    minor_updates = []
-    patch_updates = []
-    pre_releases = []
-    non_semantic_versions = []
+    newer_releases = 0
+    pre_releases = 0
+    categorized_package_data = {}
 
     if package_data:
         latest_release = package_data['info']['version']
         latest_release_license = package_data['info']['license'] if package_data['info']['license'] else ''
+        categorized_package_data = get_categorized_package_data(package_data, package_version)
 
-        for release, info in package_data['releases'].items():
-            parsed_release = parse(release)
-
-            upload_time = None
-            if info:
-                upload_time = datetime.strptime(info[0]['upload_time'], "%Y-%m-%dT%H:%M:%S")
-
-            try:
-                # Get semantic version of package
-                release_version = semantic_version.Version.coerce(release)
-
-                if not parsed_release.is_prerelease:
-                    # Place package in the appropriate semantic visioning list
-                    if release_version in semantic_version.Spec(">=%s" % package_version.next_major()):
-                        major_updates.append({
-                            'version': release,
-                            'upload_time': upload_time,
-                        })
-                    elif release_version in semantic_version.Spec(">=%s,<%s" % (package_version.next_minor(), package_version.next_major())):
-                        minor_updates.append({
-                            'version': release,
-                            'upload_time': upload_time,
-                        })
-                    elif release_version in semantic_version.Spec(">=%s,<%s" % (package_version.next_patch(), package_version.next_minor())):
-                        patch_updates.append({
-                            'version': release,
-                            'upload_time': upload_time,
-                        })
-                else:
-                    pre_releases.append({
-                        'version': release,
-                        'upload_time': upload_time
-                    })
-            except ValueError:
-                # Keep track of versions that could not be recognized as semantic
-                non_semantic_versions.append({'version': release, 'upload_time': upload_time})
+        # Get number of newer releases available for the given package, excluding pre_releases and non semantic versions
+        newer_releases = len(
+            categorized_package_data['major_updates'] +
+            categorized_package_data['minor_updates'] +
+            categorized_package_data['patch_updates']
+        )
+        pre_releases = len(categorized_package_data['pre_release_updates'])
 
     if version_data:
         current_release = version_data['info']['version']
         current_release_license = version_data['info']['license'] if version_data['info']['license'] else ''
-
-    # Get number of newer releases available for the given package
-    newer_releases = len(major_updates + minor_updates + patch_updates)
 
     return {
         'current_release': current_release,
@@ -174,12 +250,13 @@ def get_package_update_list(package_name, version):
         'latest_release': latest_release,
         'latest_release_license': latest_release_license,
         'newer_releases': newer_releases,
-        'pre_releases': len(pre_releases),
-        'major_updates': sorted(major_updates, key=lambda x: semantic_version.Version.coerce(x['version']), reverse=True),
-        'minor_updates': sorted(minor_updates, key=lambda x: semantic_version.Version.coerce(x['version']), reverse=True),
-        'patch_updates': sorted(patch_updates, key=lambda x: semantic_version.Version.coerce(x['version']), reverse=True),
-        'pre_release_updates': sorted(pre_releases, key=lambda x: semantic_version.Version.coerce(x['version']), reverse=True),
-        'non_semantic_versions': non_semantic_versions,
+        'pre_releases': pre_releases,
+        # ToDo replace with unpacking once support for python 2.7 is dropped
+        'major_updates': categorized_package_data['major_updates'],
+        'minor_updates': categorized_package_data['minor_updates'],
+        'patch_updates': categorized_package_data['patch_updates'],
+        'pre_release_updates': categorized_package_data['pre_release_updates'],
+        'non_semantic_versions': categorized_package_data['non_semantic_versions'],
     }
 
 
@@ -190,7 +267,6 @@ def __list_package_updates(package_name, version):
     :param package_name: string
     :param version: string
     """
-
     updates = get_package_update_list(package_name, version)
 
     if updates['newer_releases'] or updates['pre_releases']:

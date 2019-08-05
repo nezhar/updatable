@@ -27,7 +27,7 @@ class TestParse(unittest.TestCase):
     def assert_package_list(self, packages):
         """
         Test if the requirements are parsed correctly
-        
+
         :param packages: dict
         """
         self.assertEqual(len(packages), 5)
