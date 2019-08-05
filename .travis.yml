@@ -5,9 +5,12 @@ python:
   - "3.4"
   - "3.5"
   - "3.6"
+  - "3.7"
+  - "3.5-dev" # 3.5 development branch
   - "3.6-dev" # 3.6 development branch
   - "3.7-dev" # 3.7 development branch
-  - "nightly" # currently points to 3.7-dev
+  - "3.8-dev" # 3.8 development branch
+  - "nightly" # nightly build
   # PyPy versions
   - "pypy"
   - "pypy3"
@@ -15,3 +18,14 @@ install:
   - pip install . # install package
 script:
   - python -m unittest discover
+
+stages:
+- lint
+- test
+
+jobs:
+  include:
+  - stage: lint
+    python: 3.7
+    install: pip install pylama
+    script: pylama ./updatable ./test
