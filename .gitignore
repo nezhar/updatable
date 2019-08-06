@@ -4,3 +4,4 @@ build/**
 venv/**
 dist/**
 updatable.egg-info/**
+/.coverage

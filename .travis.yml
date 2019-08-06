@@ -16,8 +16,12 @@ python:
   - "pypy3"
 install:
   - pip install . # install package
+  - pip install codecov
 script:
-  - python -m unittest discover
+  - coverage run --branch --source=updatable run_tests.py
+  - coverage xml
+after_success:
+  - codecov
 
 stages:
 - lint
