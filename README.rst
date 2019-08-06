@@ -3,6 +3,8 @@ Updatable
 
 .. image:: https://travis-ci.org/nezhar/updatable.svg?branch=master
     :target: https://travis-ci.org/nezhar/updatable
+.. image:: https://codecov.io/gh/nezhar/updatable/branch/master/graph/badge.svg
+  :target: https://codecov.io/gh/nezhar/updatable
 
 Finds packages that require updates on a python environment
 
