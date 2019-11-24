@@ -260,22 +260,41 @@ def get_package_update_list(package_name, version):
     }
 
 
-def __list_package_updates(package_name, version):
+def __str_to_bool(value):
+    if isinstance(value, bool):
+        return value
+    if value.lower() in ('yes', 'true', 't', 'y', '1'):
+        return True
+    elif value.lower() in ('no', 'false', 'f', 'n', '0'):
+        return False
+    else:
+        raise argparse.ArgumentTypeError('Boolean value expected!')
+
+
+def __list_package_updates(package_name, version, show_pre_releases=False):
     """
     Function used to list all package updates in console
 
     :param package_name: string
     :param version: string
+    :param show_pre_releases bool
     """
+    has_displayed_updates = False
     updates = get_package_update_list(package_name, version)
 
-    if updates['newer_releases'] or updates['pre_releases']:
+    if updates['newer_releases']:
         print('%s (%s)' % (package_name, version))
         __list_updates('Major releases', updates['major_updates'])
         __list_updates('Minor releases', updates['minor_updates'])
         __list_updates('Patch releases', updates['patch_updates'])
-        __list_updates('Pre releases', updates['pre_release_updates'])
         __list_updates('Unknown releases', updates['non_semantic_versions'])
+        has_displayed_updates = True
+
+    if show_pre_releases and updates['pre_releases']:
+        __list_updates('Pre releases', updates['pre_release_updates'])
+        has_displayed_updates = True
+
+    if has_displayed_updates:
         print("___")
 
 
@@ -298,7 +317,8 @@ def __updatable():
     """
     # Add argument for console
     parser = argparse.ArgumentParser()
-    parser.add_argument('file', nargs='?', type=argparse.FileType(), default=None, help='Requirements file')
+    parser.add_argument('-f', '--file', nargs='?', type=argparse.FileType(), default=None, help='Requirements file')
+    parser.add_argument('-pr', '--pre-releases', nargs='?', type=__str_to_bool, default=False, help='Show pre-releases')
     args = parser.parse_args()
 
     # Get list of packages
@@ -309,7 +329,7 @@ def __updatable():
 
     # Output updates
     for package in packages:
-        __list_package_updates(package['package'], package['version'])
+        __list_package_updates(package['package'], package['version'], args.pre_releases)
 
 
 if __name__ == '__main__':
