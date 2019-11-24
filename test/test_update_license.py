@@ -3,7 +3,7 @@ import unittest
 import os
 import json
 
-import updatable
+from updatable import utils as updatable_utils
 
 
 PATH = os.path.dirname(os.path.realpath(__file__))
@@ -25,29 +25,29 @@ class TestUpdateLicense(unittest.TestCase):
     """
 
     def setUp(self):
-        self.get_pypi_package_data_orig = updatable.get_pypi_package_data
-        updatable.get_pypi_package_data = get_pypi_package_data_monkey
+        self.get_pypi_package_data_orig = updatable_utils.get_pypi_package_data
+        updatable_utils.get_pypi_package_data = get_pypi_package_data_monkey
 
     def tearDown(self):
-        updatable.get_pypi_package_data = self.get_pypi_package_data_orig
+        updatable_utils.get_pypi_package_data = self.get_pypi_package_data_orig
 
     def test_update_license(self):
         """
         Test update count for a package that has only major releases
         """
-        updates = updatable.get_package_update_list('package3', '1.0.0')
+        updates = updatable_utils.get_package_update_list('package3', '1.0.0')
         self.assertEqual(updates['current_release'], '1.0.0')
         self.assertEqual(updates['latest_release'], '3.0.0')
         self.assertEqual(updates['current_release_license'], 'GPL-2.0')
         self.assertEqual(updates['latest_release_license'], 'MIT')
 
-        updates = updatable.get_package_update_list('package3', '2.0.0')
+        updates = updatable_utils.get_package_update_list('package3', '2.0.0')
         self.assertEqual(updates['current_release'], '2.0.0')
         self.assertEqual(updates['latest_release'], '3.0.0')
         self.assertEqual(updates['current_release_license'], 'GPL-3.0')
         self.assertEqual(updates['latest_release_license'], 'MIT')
 
-        updates = updatable.get_package_update_list('package3', '3.0.0')
+        updates = updatable_utils.get_package_update_list('package3', '3.0.0')
         self.assertEqual(updates['current_release'], '3.0.0')
         self.assertEqual(updates['latest_release'], '3.0.0')
         self.assertEqual(updates['current_release_license'], 'MIT')

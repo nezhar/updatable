@@ -83,7 +83,7 @@ setup(
     packages=find_packages(exclude=('test',)),
     entry_points={
         'console_scripts': [
-            'updatable = updatable:__updatable',
+            'updatable = updatable.console:_updatable',
         ]
     },
     install_requires=REQUIRED,

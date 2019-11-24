@@ -19,7 +19,7 @@ install:
   - pip install . # install package
   - pip install codecov
 script:
-  - coverage run --branch --source=updatable run_tests.py
+  - coverage run --branch --source=updatable --omit=updatable/__version__.py,updatable/__main__.py run_tests.py
   - coverage xml
 after_success:
   - codecov

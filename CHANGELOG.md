@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - `-pr`, `--pre-releases` parameter to explicitly enable display of pre-releases in console
 
+### Changed
+- Module structure for module and console functions
 
 ## [0.3.1]
 ### Changed

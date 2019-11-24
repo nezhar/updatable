@@ -2,7 +2,7 @@
 import unittest
 import os
 
-import updatable
+from updatable import utils as updatable_utils
 
 
 PATH = os.path.dirname(os.path.realpath(__file__))
@@ -18,11 +18,11 @@ def get_environment_requirements_list_monkey(*args, **kwargs):
 class TestParse(unittest.TestCase):
 
     def setUp(self):
-        self.get_environment_requirements_list_orig = updatable.get_environment_requirements_list
-        updatable.get_environment_requirements_list = get_environment_requirements_list_monkey
+        self.get_environment_requirements_list_orig = updatable_utils.get_environment_requirements_list
+        updatable_utils.get_environment_requirements_list = get_environment_requirements_list_monkey
 
     def tearDown(self):
-        updatable.get_environment_requirements_list = self.get_environment_requirements_list_orig
+        updatable_utils.get_environment_requirements_list = self.get_environment_requirements_list_orig
 
     def assert_package_list(self, packages):
         """
@@ -48,7 +48,7 @@ class TestParse(unittest.TestCase):
         """
         Test parsing requirements from environment
         """
-        packages = updatable.get_parsed_environment_package_list()
+        packages = updatable_utils.get_parsed_environment_package_list()
         self.assert_package_list(packages)
 
     def test_parse_requirements_list(self):
@@ -56,7 +56,7 @@ class TestParse(unittest.TestCase):
         Test parsing requirements list
         """
         requirements_list = ['package1==0.1', 'package2==1.0', 'package3==2', 'package4==2.4', 'package5==3.0.0', ]
-        packages = updatable.parse_requirements_list(requirements_list)
+        packages = updatable_utils.parse_requirements_list(requirements_list)
         self.assert_package_list(packages)
 
 
