@@ -1,8 +1,11 @@
 #!/usr/bin/env python
 import unittest
+from unittest.mock import patch
 import os
 import json
 import datetime
+
+import requests
 
 from updatable import utils as updatable_utils
 
@@ -15,6 +18,26 @@ def get_pypi_package_data_monkey(package_name, version=None):
 
     with open(os.path.join(PATH, 'fixtures', json_file)) as data_file:
         return json.load(data_file)
+
+
+# This method will be used by the mock to replace requests.get
+def mocked_pypi_get(*args, **kwargs):
+    class MockResponse:
+
+        def __init__(self, json_data, status_code):
+            self.ok = True
+            self.json_data = json_data
+            self.status_code = status_code
+
+        def json(self):
+            return self.json_data
+
+    if args[0] == 'https://pypi.org/pypi/updatable/json':
+        return MockResponse({"test1": "ok"}, 200)
+    elif args[0] == 'https://pypi.org/pypi/updatable/1.0.0/json':
+        return MockResponse({"test2": "ok"}, 200)
+
+    return MockResponse(None, 404)
 
 
 class TestUpdate(unittest.TestCase):
@@ -283,6 +306,46 @@ class TestUpdate(unittest.TestCase):
         self.assertEqual(len(updates['minor_updates']), 0)
         self.assertEqual(len(updates['patch_updates']), 0)
         self.assertEqual(len(updates['non_semantic_versions']), 3)
+
+
+class TestGetPackageData(unittest.TestCase):
+
+    @patch('requests.get', side_effect=mocked_pypi_get)
+    def test_get_pypi_package_data_no_version(self, mock):
+        """
+        Assures that fetched pypi data is parsed correctly if no version is given
+        """
+        response = updatable_utils.get_pypi_package_data('updatable')
+        self.assertTrue(mock.called)
+        self.assertDictEqual(response, {"test1": "ok"})
+
+    @patch('requests.get', side_effect=mocked_pypi_get)
+    def test_get_pypi_package_data_existing_version(self, mock):
+        """
+        Assures that fetched pypi data is parsed correctly if a valid version is given
+        """
+        response = updatable_utils.get_pypi_package_data('updatable', '1.0.0')
+        self.assertTrue(mock.called)
+        self.assertDictEqual(response, {"test2": "ok"})
+
+    @patch('requests.get', side_effect=mocked_pypi_get)
+    def test_get_pypi_package_data_with_non_existing_version(self, mock):
+        """
+        Assures that None is return if a invalid version is given
+        """
+        response = updatable_utils.get_pypi_package_data('updatable', '2.0.0')
+        self.assertTrue(mock.called)
+        self.assertEqual(response, None)
+
+    @patch('requests.get', side_effect=requests.ConnectionError)
+    def test_get_pypi_package_data_with_connection_error(self, mock):
+        """
+        Assures a RuntimeError is raised on connection error
+        """
+        with self.assertRaises(RuntimeError):
+            updatable_utils.get_pypi_package_data('updatable')
+
+        self.assertTrue(mock.called)
 
 
 if __name__ == '__main__':

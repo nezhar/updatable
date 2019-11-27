@@ -31,3 +31,7 @@ class TestStrToBool(unittest.TestCase):
 
         with self.assertRaises(ArgumentTypeError):
             _str_to_bool('eye')
+
+
+if __name__ == '__main__':
+    unittest.main()

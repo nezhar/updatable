@@ -5,6 +5,11 @@ from updatable import utils as updatable_utils
 
 
 def _str_to_bool(value):
+    """
+    Converts a string into a bool
+
+    :param pacvaluekage_name: string
+    """
     if isinstance(value, bool):
         return value
     if value.lower() in ('yes', 'true', 't', 'y', '1'):
