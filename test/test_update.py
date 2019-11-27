@@ -20,26 +20,6 @@ def get_pypi_package_data_monkey(package_name, version=None):
         return json.load(data_file)
 
 
-# This method will be used by the mock to replace requests.get
-def mocked_pypi_get(*args, **kwargs):
-    class MockResponse:
-
-        def __init__(self, json_data, status_code):
-            self.ok = True
-            self.json_data = json_data
-            self.status_code = status_code
-
-        def json(self):
-            return self.json_data
-
-    if args[0] == 'https://pypi.org/pypi/updatable/json':
-        return MockResponse({"test1": "ok"}, 200)
-    elif args[0] == 'https://pypi.org/pypi/updatable/1.0.0/json':
-        return MockResponse({"test2": "ok"}, 200)
-
-    return MockResponse(None, 404)
-
-
 class TestUpdate(unittest.TestCase):
     """
     Tests package updatability
@@ -310,42 +290,112 @@ class TestUpdate(unittest.TestCase):
 
 class TestGetPackageData(unittest.TestCase):
 
-    @patch('requests.get', side_effect=mocked_pypi_get)
-    def test_get_pypi_package_data_no_version(self, mock):
+    def _mocked_pypi_get(*args, **kwargs):
+        """
+        This method is used to mock the pipi api on requests.get
+        """
+        class MockResponse:
+
+            def __init__(self, json_data, status_code, ok=True):
+                self.ok = ok
+                self.json_data = json_data
+                self.status_code = status_code
+
+            def json(self):
+                return self.json_data
+
+        if args[1] == 'https://pypi.org/pypi/updatable/json':
+            return MockResponse({"test1": "ok"}, 200)
+        elif args[1] == 'https://pypi.org/pypi/updatable/1.0.0/json':
+            return MockResponse({"test2": "ok"}, 200)
+        elif args[1] == 'https://pypi.org/pypi/updatable/2.5.0/json':
+            return MockResponse({}, 404, False)
+
+        return MockResponse(None, 404)
+
+    def test_get_pypi_package_data_no_version(self):
         """
         Assures that fetched pypi data is parsed correctly if no version is given
         """
-        response = updatable_utils.get_pypi_package_data('updatable')
-        self.assertTrue(mock.called)
-        self.assertDictEqual(response, {"test1": "ok"})
+        with patch('requests.get', side_effect=self._mocked_pypi_get) as mock:
+            response = updatable_utils.get_pypi_package_data('updatable')
+            self.assertTrue(mock.called)
+            self.assertDictEqual(response, {"test1": "ok"})
 
-    @patch('requests.get', side_effect=mocked_pypi_get)
-    def test_get_pypi_package_data_existing_version(self, mock):
+    def test_get_pypi_package_data_existing_version(self):
         """
         Assures that fetched pypi data is parsed correctly if a valid version is given
         """
-        response = updatable_utils.get_pypi_package_data('updatable', '1.0.0')
-        self.assertTrue(mock.called)
-        self.assertDictEqual(response, {"test2": "ok"})
+        with patch('requests.get', side_effect=self._mocked_pypi_get) as mock:
+            response = updatable_utils.get_pypi_package_data('updatable', '1.0.0')
+            self.assertTrue(mock.called)
+            self.assertDictEqual(response, {"test2": "ok"})
 
-    @patch('requests.get', side_effect=mocked_pypi_get)
-    def test_get_pypi_package_data_with_non_existing_version(self, mock):
+    def test_get_pypi_package_data_with_non_existing_version(self):
         """
         Assures that None is return if a invalid version is given
         """
-        response = updatable_utils.get_pypi_package_data('updatable', '2.0.0')
-        self.assertTrue(mock.called)
-        self.assertEqual(response, None)
+        with patch('requests.get', side_effect=self._mocked_pypi_get) as mock:
+            response = updatable_utils.get_pypi_package_data('updatable', '2.0.0')
+            self.assertTrue(mock.called)
+            self.assertEqual(response, None)
 
-    @patch('requests.get', side_effect=requests.ConnectionError)
-    def test_get_pypi_package_data_with_connection_error(self, mock):
+    def test_get_pypi_package_data_not_ok(self):
+        """
+        Assures that None is return if the response is not ok
+        """
+        with patch('requests.get', side_effect=self._mocked_pypi_get) as mock:
+            response = updatable_utils.get_pypi_package_data('updatable', '2.5.0')
+            self.assertTrue(mock.called)
+            self.assertEqual(response, None)
+
+    def test_get_pypi_package_data_with_connection_error(self):
         """
         Assures a RuntimeError is raised on connection error
         """
-        with self.assertRaises(RuntimeError):
-            updatable_utils.get_pypi_package_data('updatable')
+        with patch('requests.get', side_effect=requests.ConnectionError) as mock:
+            with self.assertRaises(RuntimeError):
+                updatable_utils.get_pypi_package_data('updatable')
 
-        self.assertTrue(mock.called)
+            self.assertTrue(mock.called)
+
+
+class TestGetEnvironmentList(unittest.TestCase):
+
+    def _mocked_subprocess_check_output(*args, **kwargs):
+        """
+        This method is used to mock the check_output function from subprocess,
+        which captures the output on the pip freeze command in `get_environment_requirements_list`
+        """
+        return """
+        package1==1.0.0
+        package2==1.2.1
+        package3==2.5.3
+        """.encode()
+
+    def test_get_mocked_environment_requirements_list(self):
+        """
+        Assures that list of mocked requirenments can be loaded from the cureent environemnt correctly
+        """
+
+        with patch('updatable.utils.check_output', side_effect=self._mocked_subprocess_check_output) as mock:
+            package_list = updatable_utils.get_environment_requirements_list()
+            self.assertTrue(mock.called)
+            self.assertListEqual(
+                package_list,
+                [
+                    "package1==1.0.0",
+                    "package2==1.2.1",
+                    "package3==2.5.3",
+                ]
+            )
+
+    def test_get_environment_requirements_list(self):
+        """
+        Assures that list of requirenments can be loaded from the cureent environemnt correctly
+        """
+        package_list = updatable_utils.get_environment_requirements_list()
+        self.assertTrue(len(package_list) > 0)
 
 
 if __name__ == '__main__':
