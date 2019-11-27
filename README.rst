@@ -6,7 +6,7 @@ Updatable
 .. image:: https://codecov.io/gh/nezhar/updatable/branch/master/graph/badge.svg
   :target: https://codecov.io/gh/nezhar/updatable
 
-Finds packages that require updates on a python environment
+Updatable help you to find packages that require updates on a python environment.
 
 Installation
 ~~~~~~~~~~~~
@@ -18,6 +18,9 @@ The latest release of updatable can be installed via PyPI:
     pip install -U updatable
 
 
+It can be installed globally or in virtual environment, depending on where you plan to check the dependencies.
+If you have a ``requirements.txt`` with pinned dependencies you can pass it as an argument to check against it.
+
 The project supports Python ``2.7``, ``3.4``, ``3.5``, ``3.6``, ``3.7``, ``3.8`` as well as ``pypy`` and ``pypy3``.
 
 
@@ -27,7 +30,11 @@ Usage
 The package can be used as a command line tool, so you can get a list of all
 packages that require updates from your current environment. You may also use
 the package inside of your python application, to list the packages over a REST
-endpoint, forward them by mail or other purpose.
+endpoint (see a `sample implementation here`__), forward them by mail or other purpose.
+
+.. _Implementation: https://github.com/anexia-it/anexia-monitoring-django
+__ Implementation_
+
 
 Example:
 ::
