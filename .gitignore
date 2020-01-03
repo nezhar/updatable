@@ -5,3 +5,4 @@ venv/**
 dist/**
 updatable.egg-info/**
 /.coverage
+/.vscode

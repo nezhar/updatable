@@ -95,3 +95,17 @@ Prints:
     urllib3 (1.25.6)
       Patch releases:
       -- 1.25.7 on 2019-11-11 15:10:09
+
+
+Development
+~~~~~~~~~~~
+
+Add pre-commit package:
+::
+
+    pip install pre-commit
+
+Install pre-commit hook:
+::
+
+    pre-commit install
