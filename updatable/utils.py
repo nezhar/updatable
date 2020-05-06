@@ -237,7 +237,13 @@ def get_package_update_list(package_name, version):
     # Information about packages
     newer_releases = 0
     pre_releases = 0
-    categorized_package_data = {}
+    categorized_package_data = {
+        'major_updates': [],
+        'minor_updates': [],
+        'patch_updates': [],
+        'pre_release_updates': [],
+        'non_semantic_versions': [],
+    }
 
     if package_data:
         latest_release = package_data['info']['version']

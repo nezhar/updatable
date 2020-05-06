@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.5.0 - Unreleased]
 
 
+## [0.4.1]
+
+### Changed
+- add default values for `categorized_package_data` to avoid crash on packages not available on pypi
+
 ## [0.4.0]
 
 ### Added
@@ -53,6 +58,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Initial Release
 
 [0.5.0 - Unreleased]: https://github.com/nezhar/updatable
+[0.4.1]: https://pypi.org/project/updatable/0.4.1/
 [0.4.0]: https://pypi.org/project/updatable/0.4.0/
 [0.3.1]: https://pypi.org/project/updatable/0.3.1/
 [0.3.0]: https://pypi.org/project/updatable/0.3.0/
