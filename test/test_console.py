@@ -56,7 +56,7 @@ class TestListUpdates(unittest.TestCase):
 
     def test_with_empty_list(self):
         with Capture() as output:
-            _list_updates("Test", [])
+            _list_updates("Test", [], 'MIT')
 
         self.assertListEqual(output, [])
 
@@ -65,12 +65,12 @@ class TestListUpdates(unittest.TestCase):
             _list_updates("Test", [
                 {"version": "1.0.0", "upload_time": "date 1"},
                 {"version": "2.0.0", "upload_time": "date 2"},
-            ])
+            ], 'MIT')
 
         self.assertListEqual(output, [
             '  Test:',
-            '  -- 1.0.0 on date 1',
-            '  -- 2.0.0 on date 2',
+            '  -- 1.0.0 on date 1 - License: MIT',
+            '  -- 2.0.0 on date 2 - License: MIT',
         ])
 
 
@@ -88,6 +88,7 @@ class TestListPackageUpdates(unittest.TestCase):
                 'patch_updates': [],
                 'pre_release_updates': [],
                 'non_semantic_versions': [],
+                'current_release_license': 'MIT',
             }
 
         # Updates, no prereeases, no non semantic version
@@ -108,6 +109,7 @@ class TestListPackageUpdates(unittest.TestCase):
                 ],
                 'pre_release_updates': [],
                 'non_semantic_versions': [],
+                'current_release_license': 'MIT',
             }
 
         # Updates, no prereeases, non semantic version
@@ -126,6 +128,7 @@ class TestListPackageUpdates(unittest.TestCase):
                 'non_semantic_versions': [
                     {"version": "test1.5.5.3.2.3.23", "upload_time": "date 6"},
                 ],
+                'current_release_license': 'MIT',
             }
 
         # Updates, prereeases, non semantic version
@@ -146,6 +149,7 @@ class TestListPackageUpdates(unittest.TestCase):
                 'non_semantic_versions': [
                     {"version": "test1.5.5.3.2.3.23", "upload_time": "date 6"},
                 ],
+                'current_release_license': 'MIT',
             }
 
         # No updates, prereeases, non semantic version
@@ -164,6 +168,7 @@ class TestListPackageUpdates(unittest.TestCase):
                 'non_semantic_versions': [
                     {"version": "test1.5.5.3.2.3.23", "upload_time": "date 6"},
                 ],
+                'current_release_license': 'MIT',
             }
 
         # Pre releases only
@@ -180,6 +185,7 @@ class TestListPackageUpdates(unittest.TestCase):
                     {"version": "alfa-1.5.5", "upload_time": "date 7"},
                 ],
                 'non_semantic_versions': [],
+                'current_release_license': 'MIT',
             }
 
         # Non semantic version only
@@ -196,6 +202,7 @@ class TestListPackageUpdates(unittest.TestCase):
                 'non_semantic_versions': [
                     {"version": "test1.5.5.3.2.3.23", "upload_time": "date 6"},
                 ],
+                'current_release_license': 'MIT',
             }
 
     def test_with_no_available_updates(self):
@@ -213,30 +220,30 @@ class TestListPackageUpdates(unittest.TestCase):
             with Capture() as output:
                 _list_package_updates("package2", "1.0.0", False)
             self.assertListEqual(output, [
-                'package2 (1.0.0)',
+                'package2 (1.0.0) - License: MIT',
                 '  Major releases:',
-                '  -- 2.0.0 on date 3',
-                '  -- 3.0.0 on date 5',
+                '  -- 2.0.0 on date 3 - License: MIT',
+                '  -- 3.0.0 on date 5 - License: MIT',
                 '  Minor releases:',
-                '  -- 1.5.0 on date 2',
-                '  -- 2.5.0 on date 4',
+                '  -- 1.5.0 on date 2 - License: MIT',
+                '  -- 2.5.0 on date 4 - License: MIT',
                 '  Patch releases:',
-                '  -- 1.5.5 on date 5',
+                '  -- 1.5.5 on date 5 - License: MIT',
                 '___'
             ])
 
             with Capture() as output:
                 _list_package_updates("package2", "1.0.0", True)
             self.assertListEqual(output, [
-                'package2 (1.0.0)',
+                'package2 (1.0.0) - License: MIT',
                 '  Major releases:',
-                '  -- 2.0.0 on date 3',
-                '  -- 3.0.0 on date 5',
+                '  -- 2.0.0 on date 3 - License: MIT',
+                '  -- 3.0.0 on date 5 - License: MIT',
                 '  Minor releases:',
-                '  -- 1.5.0 on date 2',
-                '  -- 2.5.0 on date 4',
+                '  -- 1.5.0 on date 2 - License: MIT',
+                '  -- 2.5.0 on date 4 - License: MIT',
                 '  Patch releases:',
-                '  -- 1.5.5 on date 5',
+                '  -- 1.5.5 on date 5 - License: MIT',
                 '___'
             ])
 
@@ -245,22 +252,22 @@ class TestListPackageUpdates(unittest.TestCase):
             with Capture() as output:
                 _list_package_updates("package3", "1.0.0", False)
             self.assertListEqual(output, [
-                'package3 (1.0.0)',
+                'package3 (1.0.0) - License: MIT',
                 '  Patch releases:',
-                '  -- 1.5.5 on date 5',
+                '  -- 1.5.5 on date 5 - License: MIT',
                 '  Unknown releases:',
-                '  -- test1.5.5.3.2.3.23 on date 6',
+                '  -- test1.5.5.3.2.3.23 on date 6 - License: MIT',
                 '___'
             ])
 
             with Capture() as output:
                 _list_package_updates("package3", "1.0.0", True)
             self.assertListEqual(output, [
-                'package3 (1.0.0)',
+                'package3 (1.0.0) - License: MIT',
                 '  Patch releases:',
-                '  -- 1.5.5 on date 5',
+                '  -- 1.5.5 on date 5 - License: MIT',
                 '  Unknown releases:',
-                '  -- test1.5.5.3.2.3.23 on date 6',
+                '  -- test1.5.5.3.2.3.23 on date 6 - License: MIT',
                 '___'
             ])
 
@@ -269,24 +276,24 @@ class TestListPackageUpdates(unittest.TestCase):
             with Capture() as output:
                 _list_package_updates("package4", "1.0.0", False)
             self.assertListEqual(output, [
-                'package4 (1.0.0)',
+                'package4 (1.0.0) - License: MIT',
                 '  Patch releases:',
-                '  -- 1.5.5 on date 5',
+                '  -- 1.5.5 on date 5 - License: MIT',
                 '  Unknown releases:',
-                '  -- test1.5.5.3.2.3.23 on date 6',
+                '  -- test1.5.5.3.2.3.23 on date 6 - License: MIT',
                 '___'
             ])
 
             with Capture() as output:
                 _list_package_updates("package4", "1.0.0", True)
             self.assertListEqual(output, [
-                'package4 (1.0.0)',
+                'package4 (1.0.0) - License: MIT',
                 '  Patch releases:',
-                '  -- 1.5.5 on date 5',
+                '  -- 1.5.5 on date 5 - License: MIT',
                 '  Unknown releases:',
-                '  -- test1.5.5.3.2.3.23 on date 6',
+                '  -- test1.5.5.3.2.3.23 on date 6 - License: MIT',
                 '  Pre releases:',
-                '  -- alfa-1.5.5 on date 7',
+                '  -- alfa-1.5.5 on date 7 - License: MIT',
                 '___'
             ])
 
@@ -299,9 +306,9 @@ class TestListPackageUpdates(unittest.TestCase):
             with Capture() as output:
                 _list_package_updates("package5", "1.0.0", True)
             self.assertListEqual(output, [
-                'package5 (1.0.0)',
+                'package5 (1.0.0) - License: MIT',
                 '  Pre releases:',
-                '  -- alfa-1.5.5 on date 7',
+                '  -- alfa-1.5.5 on date 7 - License: MIT',
                 '___'
             ])
 
@@ -314,9 +321,9 @@ class TestListPackageUpdates(unittest.TestCase):
             with Capture() as output:
                 _list_package_updates("package6", "1.0.0", True)
             self.assertListEqual(output, [
-                'package6 (1.0.0)',
+                'package6 (1.0.0) - License: MIT',
                 '  Pre releases:',
-                '  -- alfa-1.5.5 on date 7',
+                '  -- alfa-1.5.5 on date 7 - License: MIT',
                 '___'
             ])
 
