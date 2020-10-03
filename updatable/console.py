@@ -30,36 +30,39 @@ def _list_package_updates(package_name, version, show_pre_releases=False):
     """
     updates = updatable_utils.get_package_update_list(package_name, version)
     has_displayed_updates = updates['newer_releases'] or (show_pre_releases and updates['pre_releases'])
+    current_release_license = updates["current_release_license"]
 
     if has_displayed_updates:
-        print('%s (%s)' % (package_name, version))
+        print('%s (%s) - License: %s' % (package_name, version, current_release_license))
 
     if updates['newer_releases']:
-        _list_updates('Major releases', updates['major_updates'])
-        _list_updates('Minor releases', updates['minor_updates'])
-        _list_updates('Patch releases', updates['patch_updates'])
-        _list_updates('Unknown releases', updates['non_semantic_versions'])
+        _list_updates('Major releases', updates['major_updates'], current_release_license)
+        _list_updates('Minor releases', updates['minor_updates'], current_release_license)
+        _list_updates('Patch releases', updates['patch_updates'], current_release_license)
+        _list_updates('Unknown releases', updates['non_semantic_versions'], current_release_license)
         has_displayed_updates = True
 
     if show_pre_releases and updates['pre_releases']:
-        _list_updates('Pre releases', updates['pre_release_updates'])
+        _list_updates('Pre releases', updates['pre_release_updates'], current_release_license)
         has_displayed_updates = True
 
     if has_displayed_updates:
         print("___")
 
 
-def _list_updates(update_type, update_list):
+def _list_updates(update_type, update_list, current_release_license):
     """
     Function used to list package updates by update type in console
 
     :param update_type: string
     :param update_list: list
+    :param current_release_license: string
     """
     if len(update_list):
         print("  %s:" % update_type)
         for update_item in update_list:
-            print("  -- %(version)s on %(upload_time)s" % update_item)
+            print("  -- %s on %s - License: %s" % (update_item['version'], update_item['upload_time'],
+                                                   current_release_license,))
 
 
 def _updatable():
