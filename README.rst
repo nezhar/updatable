@@ -35,8 +35,8 @@ endpoint (see a `sample implementation here`__), forward them by mail or other p
 .. _Implementation: https://github.com/anexia-it/anexia-monitoring-django
 __ Implementation_
 
-
-Example:
+Example
+-------
 ::
 
     $> updatable
@@ -96,6 +96,40 @@ Prints:
       Patch releases:
       -- 1.25.7 on 2019-11-11 15:10:09
 
+
+Console Parameters
+------------------
+The console program offers the following parameters:
+
+::
+
+    -f <filename>
+    --file <filename>
+
+Optionally defines a requirements file to use.
+
+If the parameter is not defined, the packages of the current Python environment will be used.
+
+::
+
+    -pre <boolean>
+    --pre-releases <boolean>
+
+Includes pre-releases in the output, as separate category.
+
+Default: false
+
+Acceptable boolean values:
+::
+
+    Positive: yes, true, t, y, 1
+    Negative: no, false, f, n, 0
+
+Example using both parameters
+-----------------------------
+::
+
+    $> updatable -f requirements.txt --pre-releases yes
 
 Development
 ~~~~~~~~~~~
