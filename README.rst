@@ -21,7 +21,7 @@ The latest release of updatable can be installed via PyPI:
 It can be installed globally or in virtual environment, depending on where you plan to check the dependencies.
 If you have a ``requirements.txt`` with pinned dependencies you can pass it as an argument to check against it.
 
-The project supports Python ``2.7``, ``3.4``, ``3.5``, ``3.6``, ``3.7``, ``3.8`` as well as ``pypy`` and ``pypy3``.
+The project supports Python ``3.5``, ``3.6``, ``3.7``, ``3.8`` as well as ``pypy3``.
 
 
 Usage

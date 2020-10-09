@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import re
 import sys
 import requests
@@ -269,10 +268,5 @@ def get_package_update_list(package_name, version):
         'latest_release_license': latest_release_license,
         'newer_releases': newer_releases,
         'pre_releases': pre_releases,
-        # ToDo replace with unpacking once support for python 2.7 is dropped
-        'major_updates': categorized_package_data['major_updates'],
-        'minor_updates': categorized_package_data['minor_updates'],
-        'patch_updates': categorized_package_data['patch_updates'],
-        'pre_release_updates': categorized_package_data['pre_release_updates'],
-        'non_semantic_versions': categorized_package_data['non_semantic_versions'],
+        **categorized_package_data,
     }

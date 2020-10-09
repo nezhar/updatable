@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import argparse
 
 from updatable import utils as updatable_utils
