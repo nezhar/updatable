@@ -28,18 +28,14 @@ jobs:
         pip install pylama codecov
 
     - name: Lint and test with pylama
-      run: |
-        pylama ../../updatable ../../test
+      run: pylama ./updatable ./test
 
     - name: Setup environment
-      run: |
-        python setup.py install
+      run: python setup.py install
 
     - name: Code Coverage
       run: |
-        coverage run \
-        --source='../../updatable' --omit='../../updatable/__version__.py,../../updatable/__main__.py'  run_tests.py \
-        && echo 'exit code '$?
+        coverage run --source='./updatable' --omit='./updatable/__main__.py'  run_tests.py
         coverage xml
 
     - name: Upload coverage to Codecov
