@@ -74,7 +74,7 @@ class PublishCommand(Command):
 
 setup(
     name=NAME,
-    version=about['__version__'],
+    version=os.getenv('PACKAGE_VERSION', '0.0.0').replace('refs/tags/', ''),
     description=DESCRIPTION,
     long_description=long_description,
     author=AUTHOR,
