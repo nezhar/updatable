@@ -1,14 +1,11 @@
 #!/usr/bin/env python
 import sys
 import unittest
+from io import StringIO
 from unittest.mock import patch
 from argparse import ArgumentTypeError
-from updatable.console import _str_to_bool, _list_updates, _list_package_updates
-
-try:
-    from StringIO import StringIO
-except ImportError:
-    from io import StringIO
+from updatable.console import _str_to_bool, _list_updates, _list_package_updates, _updatable, _argument_parser
+from test.utils import get_environment_requirements_list_monkey, TEST_REQUIREMENTS_PATH
 
 
 class Capture(list):
@@ -205,6 +202,17 @@ class TestListPackageUpdates(unittest.TestCase):
                 'current_release_license': 'MIT',
             }
 
+    def _mock_argument_parser(*args, **kwargs):
+        class MockResult():
+            file = get_environment_requirements_list_monkey()
+            pre_releases = False
+
+        class ArgumentParserMock():
+            def parse_args(*args, **kwargs):
+                return MockResult()
+
+        return ArgumentParserMock()
+
     def test_with_no_available_updates(self):
         with patch('updatable.utils.get_package_update_list', side_effect=self._mock_get_package_update_list):
             with Capture() as output:
@@ -336,6 +344,145 @@ class TestListPackageUpdates(unittest.TestCase):
             with Capture() as output:
                 _list_package_updates("package7", "1.0.0", True)
             self.assertListEqual(output, [])
+
+    def test_updatable_call(self):
+        with patch('updatable.console._argument_parser', side_effect=self._mock_argument_parser):
+            with patch('updatable.utils.get_package_update_list', side_effect=self._mock_get_package_update_list):
+                with Capture() as output:
+                    _updatable()
+
+                self.assertListEqual(output, [
+                    'package2 (1.0) - License: MIT',
+                    '  Major releases:',
+                    '  -- 2.0.0 on date 3 - License: MIT',
+                    '  -- 3.0.0 on date 5 - License: MIT',
+                    '  Minor releases:',
+                    '  -- 1.5.0 on date 2 - License: MIT',
+                    '  -- 2.5.0 on date 4 - License: MIT',
+                    '  Patch releases:',
+                    '  -- 1.5.5 on date 5 - License: MIT',
+                    '___',
+                    'package3 (2) - License: MIT',
+                    '  Patch releases:',
+                    '  -- 1.5.5 on date 5 - License: MIT',
+                    '  Unknown releases:',
+                    '  -- test1.5.5.3.2.3.23 on date 6 - License: MIT',
+                    '___',
+                    'package4 (2.4) - License: MIT',
+                    '  Patch releases:',
+                    '  -- 1.5.5 on date 5 - License: MIT',
+                    '  Unknown releases:',
+                    '  -- test1.5.5.3.2.3.23 on date 6 - License: MIT',
+                    '___'
+                ])
+
+
+class TestArgumentParser(unittest.TestCase):
+
+    def setUp(self):
+        self.parser = _argument_parser()
+
+    def test_argument_parser_pre_release(self):
+        # Long param
+        parsed = self.parser.parse_args(['--pre-release', 'True'])
+        self.assertEqual(parsed.pre_releases, True)
+
+        parsed = self.parser.parse_args(['--pre-release', 'Yes'])
+        self.assertEqual(parsed.pre_releases, True)
+
+        parsed = self.parser.parse_args(['--pre-release', 'T'])
+        self.assertEqual(parsed.pre_releases, True)
+
+        parsed = self.parser.parse_args(['--pre-release', 't'])
+        self.assertEqual(parsed.pre_releases, True)
+
+        parsed = self.parser.parse_args(['--pre-release', '1'])
+        self.assertEqual(parsed.pre_releases, True)
+
+        parsed = self.parser.parse_args(['--pre-release', 'TrUe'])
+        self.assertEqual(parsed.pre_releases, True)
+
+        parsed = self.parser.parse_args(['--pre-release', 'f'])
+        self.assertEqual(parsed.pre_releases, False)
+
+        parsed = self.parser.parse_args(['--pre-release', 'n'])
+        self.assertEqual(parsed.pre_releases, False)
+
+        parsed = self.parser.parse_args(['--pre-release', '0'])
+        self.assertEqual(parsed.pre_releases, False)
+
+        parsed = self.parser.parse_args(['--pre-release', 'FaLse'])
+        self.assertEqual(parsed.pre_releases, False)
+
+        with self.assertRaises(SystemExit):
+            self.parser.parse_args(['--pre-release', 'Invalid'])
+
+        # Short param
+        parsed = self.parser.parse_args(['-pr', 'True'])
+        self.assertEqual(parsed.pre_releases, True)
+
+        parsed = self.parser.parse_args(['-pr', 'Yes'])
+        self.assertEqual(parsed.pre_releases, True)
+
+        parsed = self.parser.parse_args(['-pr', 'T'])
+        self.assertEqual(parsed.pre_releases, True)
+
+        parsed = self.parser.parse_args(['-pr', 't'])
+        self.assertEqual(parsed.pre_releases, True)
+
+        parsed = self.parser.parse_args(['-pr', '1'])
+        self.assertEqual(parsed.pre_releases, True)
+
+        parsed = self.parser.parse_args(['-pr', 'TrUe'])
+        self.assertEqual(parsed.pre_releases, True)
+
+        parsed = self.parser.parse_args(['-pr', 'f'])
+        self.assertEqual(parsed.pre_releases, False)
+
+        parsed = self.parser.parse_args(['-pr', 'n'])
+        self.assertEqual(parsed.pre_releases, False)
+
+        parsed = self.parser.parse_args(['-pr', '0'])
+        self.assertEqual(parsed.pre_releases, False)
+
+        parsed = self.parser.parse_args(['-pr', 'FaLse'])
+        self.assertEqual(parsed.pre_releases, False)
+
+        with self.assertRaises(SystemExit):
+            self.parser.parse_args(['-pr', 'Invalid'])
+
+    def test_invalid_argument(self):
+        with self.assertRaises(SystemExit):
+            self.parser.parse_args(['--invalid', 'Value'])
+
+    def test_argument_parser_pre_file(self):
+        # Long param
+        parsed = self.parser.parse_args(['--file', TEST_REQUIREMENTS_PATH])
+
+        self.assertEqual(list(parsed.file), [
+            "package1==0.1\n",
+            "package2==1.0\n",
+            "package3==2\n",
+            "package4==2.4\n",
+            "package5==3.0.0"
+        ])
+
+        with self.assertRaises(SystemExit):
+            self.parser.parse_args(['--file', 'Invalid'])
+
+        # Short param
+        parsed = self.parser.parse_args(['-f', TEST_REQUIREMENTS_PATH])
+
+        self.assertEqual(list(parsed.file), [
+            "package1==0.1\n",
+            "package2==1.0\n",
+            "package3==2\n",
+            "package4==2.4\n",
+            "package5==3.0.0"
+        ])
+
+        with self.assertRaises(SystemExit):
+            self.parser.parse_args(['-f', 'Invalid'])
 
 
 if __name__ == '__main__':

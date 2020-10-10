@@ -64,15 +64,22 @@ def _list_updates(update_type, update_list, current_release_license):
                                                    current_release_license,))
 
 
+def _argument_parser():
+    """
+    Configure arguments for console
+    """
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-f', '--file', nargs='?', type=argparse.FileType(), default=None, help='Requirements file')
+    parser.add_argument('-pr', '--pre-releases', nargs='?', type=_str_to_bool, default=False, help='Show pre-releases')
+
+    return parser
+
+
 def _updatable():
     """
     Function used to output packages update information in the console
     """
-    # Add argument for console
-    parser = argparse.ArgumentParser()
-    parser.add_argument('-f', '--file', nargs='?', type=argparse.FileType(), default=None, help='Requirements file')
-    parser.add_argument('-pr', '--pre-releases', nargs='?', type=_str_to_bool, default=False, help='Show pre-releases')
-    args = parser.parse_args()
+    args = _argument_parser().parse_args()
 
     # Get list of packages
     if args.file:
