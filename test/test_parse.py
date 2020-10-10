@@ -1,18 +1,8 @@
 #!/usr/bin/env python
 import unittest
-import os
 
 from updatable import utils as updatable_utils
-
-
-PATH = os.path.dirname(os.path.realpath(__file__))
-
-
-def get_environment_requirements_list_monkey(*args, **kwargs):
-    with open(os.path.join(PATH, 'fixtures/requirements-initial.txt')) as f:
-        content = f.readlines()
-
-    return content
+from test.utils import get_environment_requirements_list_monkey
 
 
 class TestParse(unittest.TestCase):
