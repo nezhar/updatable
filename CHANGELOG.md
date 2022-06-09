@@ -6,6 +6,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.7.0 - Unreleased]
 
+### Added
+- black in pre-commit
+
+### Changed
+- add support for python 3.10
+- drop support for python 3.6 and pypy3 <= 3.6
+
+### Removed
+- pylama form pre-commit
+
 ## [0.6.0]
 
 ### Changed
