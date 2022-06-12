@@ -1,17 +1,13 @@
 #!/usr/bin/env python
+import asyncio
 import sys
 import unittest
-from io import StringIO
-from unittest.mock import patch
 from argparse import ArgumentTypeError
-from updatable.console import (
-    _str_to_bool,
-    _list_updates,
-    _list_package_updates,
-    _updatable,
-    _argument_parser,
-)
-from test.utils import get_environment_requirements_list_monkey, TEST_REQUIREMENTS_PATH
+from io import StringIO
+from test.utils import TEST_REQUIREMENTS_PATH, get_environment_requirements_list_monkey
+from unittest.mock import patch
+
+from updatable.console import _argument_parser, _list_package_updates, _list_updates, _str_to_bool, _updatable
 
 
 class Capture(list):
@@ -83,7 +79,7 @@ class TestListUpdates(unittest.TestCase):
 
 
 class TestListPackageUpdates(unittest.TestCase):
-    def _mock_get_package_update_list(*args, **kwargs):
+    async def _mock_get_package_update_list(*args, **kwargs):
 
         # No updates, no prereeases, no non semantic version
         if args[1] == "package1":
@@ -219,11 +215,11 @@ class TestListPackageUpdates(unittest.TestCase):
             side_effect=self._mock_get_package_update_list,
         ):
             with Capture() as output:
-                _list_package_updates("package1", "1.0.0", False)
+                asyncio.run(_list_package_updates("package1", "1.0.0", False))
             self.assertListEqual(output, [])
 
             with Capture() as output:
-                _list_package_updates("package1", "1.0.0", True)
+                asyncio.run(_list_package_updates("package1", "1.0.0", True))
             self.assertListEqual(output, [])
 
     def test_with_updates_and_no_prereleases(self):
@@ -232,7 +228,7 @@ class TestListPackageUpdates(unittest.TestCase):
             side_effect=self._mock_get_package_update_list,
         ):
             with Capture() as output:
-                _list_package_updates("package2", "1.0.0", False)
+                asyncio.run(_list_package_updates("package2", "1.0.0", False))
             self.assertListEqual(
                 output,
                 [
@@ -250,7 +246,7 @@ class TestListPackageUpdates(unittest.TestCase):
             )
 
             with Capture() as output:
-                _list_package_updates("package2", "1.0.0", True)
+                asyncio.run(_list_package_updates("package2", "1.0.0", True))
             self.assertListEqual(
                 output,
                 [
@@ -273,7 +269,7 @@ class TestListPackageUpdates(unittest.TestCase):
             side_effect=self._mock_get_package_update_list,
         ):
             with Capture() as output:
-                _list_package_updates("package3", "1.0.0", False)
+                asyncio.run(_list_package_updates("package3", "1.0.0", False))
             self.assertListEqual(
                 output,
                 [
@@ -287,7 +283,7 @@ class TestListPackageUpdates(unittest.TestCase):
             )
 
             with Capture() as output:
-                _list_package_updates("package3", "1.0.0", True)
+                asyncio.run(_list_package_updates("package3", "1.0.0", True))
             self.assertListEqual(
                 output,
                 [
@@ -306,7 +302,7 @@ class TestListPackageUpdates(unittest.TestCase):
             side_effect=self._mock_get_package_update_list,
         ):
             with Capture() as output:
-                _list_package_updates("package4", "1.0.0", False)
+                asyncio.run(_list_package_updates("package4", "1.0.0", False))
             self.assertListEqual(
                 output,
                 [
@@ -320,7 +316,7 @@ class TestListPackageUpdates(unittest.TestCase):
             )
 
             with Capture() as output:
-                _list_package_updates("package4", "1.0.0", True)
+                asyncio.run(_list_package_updates("package4", "1.0.0", True))
             self.assertListEqual(
                 output,
                 [
@@ -341,11 +337,11 @@ class TestListPackageUpdates(unittest.TestCase):
             side_effect=self._mock_get_package_update_list,
         ):
             with Capture() as output:
-                _list_package_updates("package5", "1.0.0", False)
+                asyncio.run(_list_package_updates("package5", "1.0.0", False))
             self.assertListEqual(output, [])
 
             with Capture() as output:
-                _list_package_updates("package5", "1.0.0", True)
+                asyncio.run(_list_package_updates("package5", "1.0.0", True))
             self.assertListEqual(
                 output,
                 [
@@ -362,11 +358,11 @@ class TestListPackageUpdates(unittest.TestCase):
             side_effect=self._mock_get_package_update_list,
         ):
             with Capture() as output:
-                _list_package_updates("package6", "1.0.0", False)
+                asyncio.run(_list_package_updates("package6", "1.0.0", False))
             self.assertListEqual(output, [])
 
             with Capture() as output:
-                _list_package_updates("package6", "1.0.0", True)
+                asyncio.run(_list_package_updates("package6", "1.0.0", True))
             self.assertListEqual(
                 output,
                 [
@@ -383,23 +379,21 @@ class TestListPackageUpdates(unittest.TestCase):
             side_effect=self._mock_get_package_update_list,
         ):
             with Capture() as output:
-                _list_package_updates("package7", "1.0.0", False)
+                asyncio.run(_list_package_updates("package7", "1.0.0", False))
             self.assertListEqual(output, [])
 
             with Capture() as output:
-                _list_package_updates("package7", "1.0.0", True)
+                asyncio.run(_list_package_updates("package7", "1.0.0", True))
             self.assertListEqual(output, [])
 
     def test_updatable_call(self):
-        with patch(
-            "updatable.console._argument_parser", side_effect=self._mock_argument_parser
-        ):
+        with patch("updatable.console._argument_parser", side_effect=self._mock_argument_parser):
             with patch(
                 "updatable.utils.get_package_update_list",
                 side_effect=self._mock_get_package_update_list,
             ):
                 with Capture() as output:
-                    _updatable()
+                    asyncio.run(_updatable())
 
                 self.assertListEqual(
                     output,
@@ -518,7 +512,7 @@ class TestArgumentParser(unittest.TestCase):
                 "package2==1.0\n",
                 "package3==2\n",
                 "package4==2.4\n",
-                "package5==3.0.0",
+                "package5==3.0.0\n",
             ],
         )
 
@@ -535,7 +529,7 @@ class TestArgumentParser(unittest.TestCase):
                 "package2==1.0\n",
                 "package3==2\n",
                 "package4==2.4\n",
-                "package5==3.0.0",
+                "package5==3.0.0\n",
             ],
         )
 

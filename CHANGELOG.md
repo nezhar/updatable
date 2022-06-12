@@ -7,14 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.7.0 - Unreleased]
 
 ### Added
+- support for python 3.10
 - black in pre-commit
+- isort in pre-commit
+- dependency `httpx`
+- display required time in console
 
 ### Changed
-- add support for python 3.10
-- drop support for python 3.6 and pypy3 <= 3.6
+- moved from synchronous to asynchronous http calls for the PyPiJSON API
 
 ### Removed
-- pylama form pre-commit
+- support for python 3.6 and pypy3 <= 3.6
+- pylama from pre-commit
+- dependency `requests`
+- dependency `pyopenssl`
 
 ## [0.6.0]
 

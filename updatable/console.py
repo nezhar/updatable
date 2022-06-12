@@ -1,4 +1,6 @@
 import argparse
+import asyncio
+import datetime
 
 from updatable import utils as updatable_utils
 
@@ -19,7 +21,7 @@ def _str_to_bool(value):
         raise argparse.ArgumentTypeError("Boolean value expected!")
 
 
-def _list_package_updates(package_name, version, show_pre_releases=False):
+async def _list_package_updates(package_name, version, show_pre_releases=False):
     """
     Function used to list all package updates in console
 
@@ -27,27 +29,17 @@ def _list_package_updates(package_name, version, show_pre_releases=False):
     :param version: string
     :param show_pre_releases bool
     """
-    updates = updatable_utils.get_package_update_list(package_name, version)
-    has_displayed_updates = updates["newer_releases"] or (
-        show_pre_releases and updates["pre_releases"]
-    )
+    updates = await updatable_utils.get_package_update_list(package_name, version)
+    has_displayed_updates = updates["newer_releases"] or (show_pre_releases and updates["pre_releases"])
     current_release_license = updates["current_release_license"]
 
     if has_displayed_updates:
-        print(
-            "%s (%s) - License: %s" % (package_name, version, current_release_license)
-        )
+        print("%s (%s) - License: %s" % (package_name, version, current_release_license))
 
     if updates["newer_releases"]:
-        _list_updates(
-            "Major releases", updates["major_updates"], current_release_license
-        )
-        _list_updates(
-            "Minor releases", updates["minor_updates"], current_release_license
-        )
-        _list_updates(
-            "Patch releases", updates["patch_updates"], current_release_license
-        )
+        _list_updates("Major releases", updates["major_updates"], current_release_license)
+        _list_updates("Minor releases", updates["minor_updates"], current_release_license)
+        _list_updates("Patch releases", updates["patch_updates"], current_release_license)
         _list_updates(
             "Unknown releases",
             updates["non_semantic_versions"],
@@ -56,9 +48,7 @@ def _list_package_updates(package_name, version, show_pre_releases=False):
         has_displayed_updates = True
 
     if show_pre_releases and updates["pre_releases"]:
-        _list_updates(
-            "Pre releases", updates["pre_release_updates"], current_release_license
-        )
+        _list_updates("Pre releases", updates["pre_release_updates"], current_release_license)
         has_displayed_updates = True
 
     if has_displayed_updates:
@@ -111,7 +101,7 @@ def _argument_parser():
     return parser
 
 
-def _updatable():
+async def _updatable():
     """
     Function used to output packages update information in the console
     """
@@ -124,5 +114,18 @@ def _updatable():
         packages = updatable_utils.get_parsed_environment_package_list()
 
     # Output updates
+    tasks = []
     for package in packages:
-        _list_package_updates(package["package"], package["version"], args.pre_releases)
+        tasks.append(
+            asyncio.create_task(_list_package_updates(package["package"], package["version"], args.pre_releases))
+        )
+
+    for task in tasks:
+        await task
+
+
+def main():  # pragma: no cover
+    t0 = datetime.datetime.now()
+    asyncio.run(_updatable())
+    dt = datetime.datetime.now() - t0
+    print(f"Done in {dt.total_seconds():.2f} sec.")

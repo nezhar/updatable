@@ -27,10 +27,13 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install .
-        pip install codecov black
+        pip install codecov black isort respx
 
     - name: Lint with black
       run: black ./updatable ./test --check
+
+    - name: Lint package sorting
+      run: isort ./updatable ./test --check
 
     - name: Setup environment
       run: python setup.py install
@@ -38,7 +41,8 @@ jobs:
     - name: Code Coverage
       run: |
         coverage run --source='./updatable' --omit='./updatable/__main__.py'  run_tests.py
+        coverage report
         coverage xml
 
     - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v1
+      uses: codecov/codecov-action@v3

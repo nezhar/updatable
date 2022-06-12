@@ -1,5 +1,6 @@
-import unittest
 import doctest
+import sys
+import unittest
 
 
 def test_suite():
@@ -9,4 +10,5 @@ def test_suite():
 
 
 if __name__ == "__main__":
-    unittest.TextTestRunner(verbosity=2).run(test_suite())
+    result = unittest.TextTestRunner(verbosity=2).run(test_suite())
+    sys.exit(not result.wasSuccessful())

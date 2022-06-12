@@ -1,5 +1,5 @@
-import os
 import io
+import os
 
 from setuptools import find_packages, setup
 
@@ -12,9 +12,8 @@ AUTHOR = "Harald Nezbeda"
 
 # What packages are required for this module to be executed?
 REQUIRED = [
-    "requests",
+    "httpx",
     "semantic_version",
-    "pyopenssl",
     "packaging",
 ]
 
@@ -37,7 +36,7 @@ setup(
     packages=find_packages(exclude=("test",)),
     entry_points={
         "console_scripts": [
-            "updatable = updatable.console:_updatable",
+            "updatable = updatable.console:main",
         ]
     },
     install_requires=REQUIRED,

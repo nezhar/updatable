@@ -1,4 +1,4 @@
-from updatable.console import _updatable
+from updatable.console import main
 
 if __name__ == "__main__":
-    _updatable()
+    main()
