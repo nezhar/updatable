@@ -1,6 +1,8 @@
 Updatable
 =========
 
+.. image:: https://badge.fury.io/py/updatable.svg
+  :target: https://pypi.org/project/updatable/
 .. image:: https://github.com/nezhar/updatable/workflows/Test/badge.svg
   :target: https://github.com/nezhar/updatable/actions?query=workflow%3ATest
 .. image:: https://codecov.io/gh/nezhar/updatable/branch/master/graph/badge.svg
@@ -95,6 +97,8 @@ Prints:
     urllib3 (1.25.6)
       Patch releases:
       -- 1.25.7 on 2019-11-11 15:10:09
+    ___
+    Done in 8.47 sec.
 
 
 Console Parameters
