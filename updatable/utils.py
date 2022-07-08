@@ -1,11 +1,11 @@
 import re
 import sys
-import requests
 from datetime import datetime
 from subprocess import check_output
-from packaging.version import parse
 
+import httpx
 import semantic_version
+from packaging.version import parse
 
 __all__ = [
     "is_major_update",
@@ -29,7 +29,7 @@ def is_major_update(release, package):
     :param package: semantic_version.Version
     :return: bool
     """
-    return release in semantic_version.Spec(">=%s" % package.next_major())
+    return release in semantic_version.SimpleSpec(">=%s" % package.next_major())
 
 
 def is_minor_update(release, package):
@@ -40,9 +40,7 @@ def is_minor_update(release, package):
     :param package: semantic_version.Version
     :return: bool
     """
-    return release in semantic_version.Spec(
-        ">=%s,<%s" % (package.next_minor(), package.next_major())
-    )
+    return release in semantic_version.SimpleSpec(">=%s,<%s" % (package.next_minor(), package.next_major()))
 
 
 def is_patch_update(release, package):
@@ -53,9 +51,7 @@ def is_patch_update(release, package):
     :param package: semantic_version.Version
     :return: bool
     """
-    return release in semantic_version.Spec(
-        ">=%s,<%s" % (package.next_patch(), package.next_minor())
-    )
+    return release in semantic_version.SimpleSpec(">=%s,<%s" % (package.next_patch(), package.next_minor()))
 
 
 def sorted_versions(versions):
@@ -127,14 +123,10 @@ def get_categorized_package_data(package_data, package_version):
                         }
                     )
             else:
-                pre_release_updates.append(
-                    {"version": release, "upload_time": upload_time}
-                )
+                pre_release_updates.append({"version": release, "upload_time": upload_time})
         except ValueError:
             # Keep track of versions that could not be recognized as semantic
-            non_semantic_versions.append(
-                {"version": release, "upload_time": upload_time}
-            )
+            non_semantic_versions.append({"version": release, "upload_time": upload_time})
 
     return {
         "major_updates": sorted_versions(major_updates),
@@ -197,7 +189,7 @@ def parse_requirements_list(requirements_list):
     return req_list
 
 
-def get_pypi_package_data(package_name, version=None):
+async def get_pypi_package_data(package_name, version=None):
     """
     Get package data from pypi by the package name
 
@@ -221,19 +213,20 @@ def get_pypi_package_data(package_name, version=None):
             package_name,
         )
 
-    try:
-        response = requests.get(package_url)
-    except requests.ConnectionError:
-        raise RuntimeError("Connection error!")
+    async with httpx.AsyncClient() as client:
+        try:
+            resp = await client.get(package_url, follow_redirects=True, timeout=None)
+        except httpx.ConnectError:
+            raise RuntimeError("Connection error!")
 
-    # Package not available on pypi
-    if not response.ok:
-        return None
+        # Package not available on pypi
+        if resp.is_error:
+            return None
 
-    return response.json()
+        return resp.json()
 
 
-def get_package_update_list(package_name, version):
+async def get_package_update_list(package_name, version):
     """
     Return update information of a package from a given version
 
@@ -244,8 +237,8 @@ def get_package_update_list(package_name, version):
     package_version = semantic_version.Version.coerce(version)
 
     # Get package and version data from pypi
-    package_data = get_pypi_package_data(package_name)
-    version_data = get_pypi_package_data(package_name, version)
+    package_data = await get_pypi_package_data(package_name)
+    version_data = await get_pypi_package_data(package_name, version)
 
     # Current release specific information
     current_release = ""
@@ -268,12 +261,8 @@ def get_package_update_list(package_name, version):
 
     if package_data:
         latest_release = package_data["info"]["version"]
-        latest_release_license = (
-            package_data["info"]["license"] if package_data["info"]["license"] else ""
-        )
-        categorized_package_data = get_categorized_package_data(
-            package_data, package_version
-        )
+        latest_release_license = package_data["info"]["license"] if package_data["info"]["license"] else ""
+        categorized_package_data = get_categorized_package_data(package_data, package_version)
 
         # Get number of newer releases available for the given package, excluding pre_releases and non semantic versions
         newer_releases = len(
@@ -285,9 +274,7 @@ def get_package_update_list(package_name, version):
 
     if version_data:
         current_release = version_data["info"]["version"]
-        current_release_license = (
-            version_data["info"]["license"] if version_data["info"]["license"] else ""
-        )
+        current_release_license = version_data["info"]["license"] if version_data["info"]["license"] else ""
 
     return {
         "current_release": current_release,

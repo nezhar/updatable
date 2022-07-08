@@ -1,23 +1,17 @@
 #!/usr/bin/env python
 import unittest
+from test.utils import get_environment_requirements_list_monkey
 
 from updatable import utils as updatable_utils
-from test.utils import get_environment_requirements_list_monkey
 
 
 class TestParse(unittest.TestCase):
     def setUp(self):
-        self.get_environment_requirements_list_orig = (
-            updatable_utils.get_environment_requirements_list
-        )
-        updatable_utils.get_environment_requirements_list = (
-            get_environment_requirements_list_monkey
-        )
+        self.get_environment_requirements_list_orig = updatable_utils.get_environment_requirements_list
+        updatable_utils.get_environment_requirements_list = get_environment_requirements_list_monkey
 
     def tearDown(self):
-        updatable_utils.get_environment_requirements_list = (
-            self.get_environment_requirements_list_orig
-        )
+        updatable_utils.get_environment_requirements_list = self.get_environment_requirements_list_orig
 
     def assert_package_list(self, packages):
         """

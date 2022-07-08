@@ -1,0 +1,8 @@
+[tool.isort]
+known_first_party = ["updatable"]
+profile = "black"
+multi_line_output = 3
+line_length = 120
+
+[tool.black]
+line_length = 120
