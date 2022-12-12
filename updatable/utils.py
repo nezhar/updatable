@@ -89,13 +89,13 @@ def get_categorized_package_data(package_data, package_version):
     non_semantic_versions = []
 
     for release, info in package_data["releases"].items():
-        parsed_release = parse(release)
-
         upload_time = None
         if info:
             upload_time = datetime.strptime(info[0]["upload_time"], "%Y-%m-%dT%H:%M:%S")
 
         try:
+            parsed_release = parse(release)
+
             # Get semantic version of package
             release_version = semantic_version.Version.coerce(release)
 
