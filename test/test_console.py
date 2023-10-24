@@ -80,7 +80,6 @@ class TestListUpdates(unittest.TestCase):
 
 class TestListPackageUpdates(unittest.TestCase):
     async def _mock_get_package_update_list(*args, **kwargs):
-
         # No updates, no prereeases, no non semantic version
         if args[1] == "package1":
             return {
