@@ -8,41 +8,36 @@ jobs:
       fail-fast: false
       matrix:
         python-version:
-          - "3.7"
-          - "3.8"
-          - "3.9"
           - "3.10"
-          - "pypy3.7"
-          - "pypy3.8"
-          - "pypy3.9"
+          - "3.11"
+          - "3.12"
+          - "3.13"
+          - "3.14"
+          - "pypy3.10"
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
 
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
 
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install .
-        pip install codecov black isort respx
+        pip install -e ".[test,dev]"
 
-    - name: Lint with black
-      run: black ./updatable ./test --check
+    - name: Lint with ruff
+      run: ruff check ./updatable ./tests
 
-    - name: Lint package sorting
-      run: isort ./updatable ./test --check
-
-    - name: Setup environment
-      run: python setup.py install
+    - name: Check formatting with ruff
+      run: ruff format --check ./updatable ./tests
 
     - name: Code Coverage
       run: |
-        coverage run --source='./updatable' --omit='./updatable/__main__.py'  run_tests.py
+        coverage run --source='./updatable' --omit='./updatable/__main__.py' run_tests.py
         coverage report
         coverage xml
 
     - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v3
+      uses: codecov/codecov-action@v4

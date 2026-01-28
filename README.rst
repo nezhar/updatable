@@ -23,7 +23,7 @@ The latest release of updatable can be installed via PyPI:
 It can be installed globally or in virtual environment, depending on where you plan to check the dependencies.
 If you have a ``requirements.txt`` with pinned dependencies you can pass it as an argument to check against it.
 
-The project supports Python ``3.7``, ``3.8``, ``3.9``, ``3.10`` as well as ``pypy3.7``, ``pypy3.8``, ``pypy3.9``.
+The project supports Python ``3.10``, ``3.11``, ``3.12``, ``3.13``, ``3.14`` as well as ``pypy3.10``.
 
 
 Usage
@@ -138,12 +138,17 @@ Example using both parameters
 Development
 ~~~~~~~~~~~
 
-Add pre-commit package:
+Install development dependencies:
 ::
 
-    pip install pre-commit
+    pip install -e ".[test,dev]"
 
-Install pre-commit hook:
+Install pre-commit hooks:
 ::
 
     pre-commit install
+
+Run checks:
+::
+
+    pre-commit run --all-files

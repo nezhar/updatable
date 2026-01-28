@@ -4,9 +4,28 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.8.0 - Unreleased]
+## [0.8.0]
 
-- WIP
+### Added
+- Support for Python 3.11, 3.12, 3.13, and 3.14
+- `pyproject.toml` as single source of packaging metadata
+- `setuptools_scm` for automatic versioning
+- Optional dependency groups: `test`, `dev`, `build`
+- `ruff` for linting and formatting
+- CONTRIBUTING.md
+- SECURITY.md
+
+### Changed
+- Migrated packaging from `setup.py` to `pyproject.toml`
+- Replaced `black` and `isort` with `ruff` in pre-commit
+- Updated CI workflows to use modern practices
+- Renamed `test/` directory to `tests/`
+- Updated GitHub Actions to latest versions
+
+### Removed
+- Legacy `setup.py`
+- Support for Python 3.7, 3.8, and 3.9
+- `black` and `isort` dependencies
 
 ## [0.7.0]
 
@@ -92,7 +111,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Initial Release
 
-[0.8.0 - Unreleased]: https://github.com/nezhar/updatable
+[0.8.0]: https://pypi.org/project/updatable/0.8.0/
 [0.7.0]: https://pypi.org/project/updatable/0.7.0/
 [0.6.0]: https://pypi.org/project/updatable/0.6.0/
 [0.5.0]: https://pypi.org/project/updatable/0.5.0/

@@ -29,7 +29,7 @@ def is_major_update(release, package):
     :param package: semantic_version.Version
     :return: bool
     """
-    return release in semantic_version.SimpleSpec(">=%s" % package.next_major())
+    return release in semantic_version.SimpleSpec(f">={package.next_major()}")
 
 
 def is_minor_update(release, package):
@@ -40,7 +40,7 @@ def is_minor_update(release, package):
     :param package: semantic_version.Version
     :return: bool
     """
-    return release in semantic_version.SimpleSpec(">=%s,<%s" % (package.next_minor(), package.next_major()))
+    return release in semantic_version.SimpleSpec(f">={package.next_minor()},<{package.next_major()}")
 
 
 def is_patch_update(release, package):
@@ -51,7 +51,7 @@ def is_patch_update(release, package):
     :param package: semantic_version.Version
     :return: bool
     """
-    return release in semantic_version.SimpleSpec(">=%s,<%s" % (package.next_patch(), package.next_minor()))
+    return release in semantic_version.SimpleSpec(f">={package.next_patch()},<{package.next_minor()}")
 
 
 def sorted_versions(versions):
@@ -106,21 +106,21 @@ def get_categorized_package_data(package_data, package_version):
                         {
                             "version": release,
                             "upload_time": upload_time,
-                        }
+                        },
                     )
                 elif is_minor_update(release_version, package_version):
                     minor_updates.append(
                         {
                             "version": release,
                             "upload_time": upload_time,
-                        }
+                        },
                     )
                 elif is_patch_update(release_version, package_version):
                     patch_updates.append(
                         {
                             "version": release,
                             "upload_time": upload_time,
-                        }
+                        },
                     )
             else:
                 pre_release_updates.append({"version": release, "upload_time": upload_time})
@@ -183,7 +183,7 @@ def parse_requirements_list(requirements_list):
                 {
                     "package": req_match.group("package"),
                     "version": req_match.group("version"),
-                }
+                },
             )
 
     return req_list
@@ -202,16 +202,9 @@ async def get_pypi_package_data(package_name, version=None):
     pypi_url = "https://pypi.org/pypi"
 
     if version:
-        package_url = "%s/%s/%s/json" % (
-            pypi_url,
-            package_name,
-            version,
-        )
+        package_url = f"{pypi_url}/{package_name}/{version}/json"
     else:
-        package_url = "%s/%s/json" % (
-            pypi_url,
-            package_name,
-        )
+        package_url = f"{pypi_url}/{package_name}/json"
 
     async with httpx.AsyncClient() as client:
         try:
@@ -268,7 +261,7 @@ async def get_package_update_list(package_name, version):
         newer_releases = len(
             categorized_package_data["major_updates"]
             + categorized_package_data["minor_updates"]
-            + categorized_package_data["patch_updates"]
+            + categorized_package_data["patch_updates"],
         )
         pre_releases = len(categorized_package_data["pre_release_updates"])
 
