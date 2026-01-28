@@ -34,7 +34,7 @@ async def _list_package_updates(package_name, version, show_pre_releases=False):
     current_release_license = updates["current_release_license"]
 
     if has_displayed_updates:
-        print("%s (%s) - License: %s" % (package_name, version, current_release_license))
+        print(f"{package_name} ({version}) - License: {current_release_license}")
 
     if updates["newer_releases"]:
         _list_updates("Major releases", updates["major_updates"], current_release_license)
@@ -64,15 +64,10 @@ def _list_updates(update_type, update_list, current_release_license):
     :param current_release_license: string
     """
     if len(update_list):
-        print("  %s:" % update_type)
+        print(f"  {update_type}:")
         for update_item in update_list:
             print(
-                "  -- %s on %s - License: %s"
-                % (
-                    update_item["version"],
-                    update_item["upload_time"],
-                    current_release_license,
-                )
+                f"  -- {update_item['version']} on {update_item['upload_time']} - License: {current_release_license}",
             )
 
 
@@ -117,7 +112,7 @@ async def _updatable():
     tasks = []
     for package in packages:
         tasks.append(
-            asyncio.create_task(_list_package_updates(package["package"], package["version"], args.pre_releases))
+            asyncio.create_task(_list_package_updates(package["package"], package["version"], args.pre_releases)),
         )
 
     for task in tasks:

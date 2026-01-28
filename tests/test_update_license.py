@@ -11,9 +11,9 @@ PATH = os.path.dirname(os.path.realpath(__file__))
 
 async def get_pypi_package_data_monkey(package_name, version=None):
     if version:
-        json_file = "pypi-%s-%s.json" % (package_name, version)
+        json_file = f"pypi-{package_name}-{version}.json"
     else:
-        json_file = "pypi-%s.json" % package_name
+        json_file = f"pypi-{package_name}.json"
 
     with open(os.path.join(PATH, "fixtures", json_file)) as data_file:
         return json.load(data_file)

@@ -4,9 +4,9 @@ import sys
 import unittest
 from argparse import ArgumentTypeError
 from io import StringIO
-from test.utils import TEST_REQUIREMENTS_PATH, get_environment_requirements_list_monkey
 from unittest.mock import patch
 
+from tests.utils import TEST_REQUIREMENTS_PATH, get_environment_requirements_list_monkey
 from updatable.console import _argument_parser, _list_package_updates, _list_updates, _str_to_bool, _updatable
 
 

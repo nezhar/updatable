@@ -15,7 +15,7 @@ PATH = os.path.dirname(os.path.realpath(__file__))
 
 
 async def get_pypi_package_data_monkey(package_name, version=None):
-    json_file = "pypi-%s.json" % package_name
+    json_file = f"pypi-{package_name}.json"
 
     with open(os.path.join(PATH, "fixtures", json_file)) as data_file:
         return json.load(data_file)
@@ -335,11 +335,11 @@ class TestGetEnvironmentList(unittest.TestCase):
         This method is used to mock the check_output function from subprocess,
         which captures the output on the pip freeze command in `get_environment_requirements_list`
         """
-        return """
+        return b"""
         package1==1.0.0
         package2==1.2.1
         package3==2.5.3
-        """.encode()
+        """
 
     def test_get_mocked_environment_requirements_list(self):
         """

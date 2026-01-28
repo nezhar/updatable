@@ -4,7 +4,7 @@ import unittest
 
 
 def test_suite():
-    suite = unittest.TestLoader().discover("test")
+    suite = unittest.TestLoader().discover("tests")
     suite.addTest(doctest.DocFileSuite("README.rst"))
     return suite
 

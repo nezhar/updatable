@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import unittest
-from test.utils import get_environment_requirements_list_monkey
 
+from tests.utils import get_environment_requirements_list_monkey
 from updatable import utils as updatable_utils
 
 
