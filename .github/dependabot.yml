@@ -7,3 +7,11 @@ updates:
     time: "04:00"
     timezone: Europe/Vienna
   open-pull-requests-limit: 99
+- package-ecosystem: github-actions
+  directory: "/"
+  schedule:
+    interval: weekly
+    day: monday
+    time: "04:00"
+    timezone: Europe/Vienna
+  open-pull-requests-limit: 99
