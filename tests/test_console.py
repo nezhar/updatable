@@ -385,6 +385,20 @@ class TestListPackageUpdates(unittest.TestCase):
                 asyncio.run(_list_package_updates("package7", "1.0.0", True))
             self.assertListEqual(output, [])
 
+    def _mock_argument_parser_without_file(*args, **kwargs):
+        class MockResult:
+            file = None
+            pre_releases = False
+
+        class ArgumentParserMock:
+            def parse_args(*args, **kwargs):
+                return MockResult()
+
+        return ArgumentParserMock()
+
+    def _mock_get_parsed_environment_package_list(*args, **kwargs):
+        return [{"package": "package2", "version": "1.0"}]
+
     def test_updatable_call(self):
         with patch("updatable.console._argument_parser", side_effect=self._mock_argument_parser):
             with patch(
@@ -418,6 +432,39 @@ class TestListPackageUpdates(unittest.TestCase):
                         "  -- 1.5.5 on date 5 - License: MIT",
                         "  Unknown releases:",
                         "  -- test1.5.5.3.2.3.23 on date 6 - License: MIT",
+                        "___",
+                    ],
+                )
+
+    def test_updatable_call_without_file(self):
+        """
+        Without a requirements file the package list is taken from the environment
+        """
+        with patch("updatable.console._argument_parser", side_effect=self._mock_argument_parser_without_file):
+            with patch(
+                "updatable.utils.get_parsed_environment_package_list",
+                side_effect=self._mock_get_parsed_environment_package_list,
+            ) as mock:
+                with patch(
+                    "updatable.utils.get_package_update_list",
+                    side_effect=self._mock_get_package_update_list,
+                ):
+                    with Capture() as output:
+                        asyncio.run(_updatable())
+
+                self.assertTrue(mock.called)
+                self.assertListEqual(
+                    output,
+                    [
+                        "package2 (1.0) - License: MIT",
+                        "  Major releases:",
+                        "  -- 2.0.0 on date 3 - License: MIT",
+                        "  -- 3.0.0 on date 5 - License: MIT",
+                        "  Minor releases:",
+                        "  -- 1.5.0 on date 2 - License: MIT",
+                        "  -- 2.5.0 on date 4 - License: MIT",
+                        "  Patch releases:",
+                        "  -- 1.5.5 on date 5 - License: MIT",
                         "___",
                     ],
                 )
