@@ -277,6 +277,44 @@ class TestUpdate(unittest.TestCase):
         self.assertEqual(len(updates["minor_updates"]), 0)
         self.assertEqual(len(updates["patch_updates"]), 0)
 
+    def test_pre_release_count(self):
+        """
+        Test update count for a package that has pre-releases,
+        which are not counted as newer releases
+        """
+        updates = asyncio.run(updatable_utils.get_package_update_list("package7", "1.0.0"))
+        self.assertEqual(updates["newer_releases"], 1)
+        self.assertEqual(updates["pre_releases"], 2)
+        self.assertEqual(len(updates["major_updates"]), 0)
+        self.assertEqual(len(updates["minor_updates"]), 1)
+        self.assertEqual(len(updates["patch_updates"]), 0)
+        self.assertEqual(len(updates["pre_release_updates"]), 2)
+
+    def test_pre_release_version(self):
+        """
+        Test pre-release versions for a package that has pre-releases.
+        This also shows that releases are ordered descendant by version.
+        """
+        updates = asyncio.run(updatable_utils.get_package_update_list("package7", "1.0.0"))
+        self.assertEqual(len(updates["pre_release_updates"]), 2)
+        self.assertEqual(updates["pre_release_updates"][0]["version"], "2.0.0b1")
+        self.assertEqual(updates["pre_release_updates"][1]["version"], "1.1.0a1")
+
+    def test_pre_release_date(self):
+        """
+        Test pre-release upload time for a package that has pre-releases
+        """
+        updates = asyncio.run(updatable_utils.get_package_update_list("package7", "1.0.0"))
+        self.assertEqual(len(updates["pre_release_updates"]), 2)
+        self.assertEqual(
+            updates["pre_release_updates"][0]["upload_time"],
+            datetime.datetime(year=2015, month=3, day=10, hour=23, minute=34, second=21),
+        )
+        self.assertEqual(
+            updates["pre_release_updates"][1]["upload_time"],
+            datetime.datetime(year=2014, month=1, day=15, hour=23, minute=34, second=21),
+        )
+
     def test_non_semantic_count(self):
         """
         Test for package with non semantic verions
