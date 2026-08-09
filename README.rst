@@ -5,7 +5,7 @@ Updatable
   :target: https://pypi.org/project/updatable/
 .. image:: https://github.com/nezhar/updatable/workflows/Test/badge.svg
   :target: https://github.com/nezhar/updatable/actions?query=workflow%3ATest
-.. image:: https://codecov.io/gh/nezhar/updatable/branch/master/graph/badge.svg
+.. image:: https://codecov.io/gh/nezhar/updatable/branch/main/graph/badge.svg
   :target: https://codecov.io/gh/nezhar/updatable
 
 Updatable help you to find packages that require updates on a python environment.
